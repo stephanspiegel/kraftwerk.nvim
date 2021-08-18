@@ -2,8 +2,8 @@ local cmd = vim.cmd
 
 local function define_commands()
     cmd("command! CheckVersion lua require'kraftwerk.system'.check_sfdx_version()")
-    cmd("command! -range=% -nargs=? ForceDataSoqlQuery lua require'kraftwerk.soql'.query(<range>, <line1>, <line2>, <q-args>)")
-    cmd("command! Test lua require'kraftwerk.window_handler'.open_result_buffer('__Query_Result__', '{\"abc\", \"def\"}')")
+    cmd("command! -range=% -nargs=? ForceDataSoqlQuery lua require'kraftwerk.data'.query(<range>, <line1>, <line2>, <q-args>)")
+    cmd("command! -range=% Test lua print(require'kraftwerk.util'.get_visual_selection())")
 end
 
 local function setup()

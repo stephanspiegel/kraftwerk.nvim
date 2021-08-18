@@ -5,22 +5,28 @@ local function stringify(data)
    return table.concat(data, "\n")
 end
 
-local function info(message)
-    print(stringify(message))
+local function echo_with_highlight(data, highlight_group)
+    if highlight_group == nil then
+        vim.api.nvim_echo({{stringify(data)}}, true, {})
+    else
+        vim.api.nvim_echo({{stringify(data), highlight_group}}, true, {})
+    end
 end
 
-local function warn(message)
-    message = stringify(message)
-    vim.cmd(([[echohl WarningMsg | echomsg "%s" | echohl None]]):format(vim.fn.escape(message, "\"\\")))
+local function info(data)
+    echo_with_highlight(data)
 end
 
-local function error(message)
-    message = stringify(message)
-    vim.cmd(([[echohl ErrorMsg | echomsg "%s" | echohl None]]):format(vim.fn.escape(message, "\"\\")))
+local function warn(data)
+    echo_with_highlight(data, "WarningMsg")
+end
+
+local function err(message)
+    echo_with_highlight(message, "ErrorMsg")
 end
 
 return {
     info = info,
     warn = warn,
-    error = error
+    err = err
 }

@@ -33,7 +33,7 @@ end
 local function on_success(result)
     local version_number = string.gsub(result.cliVersion,"sfdx%-cli/", "")
     if not version_is_supported(version_number) then
-        echo.error("Found sfdx version "..version_number.. ". Need version "..oldest_supported_version.." or higher.")
+        echo.err("Found sfdx version "..version_number.. ". Need version "..oldest_supported_version.." or higher.")
         return
     end
     echo.info("sfdx version check ✓")
@@ -41,7 +41,7 @@ end
 
 local function check_sfdx_version()
     if not sfdx_is_installed() then
-        echo.error("No sfdx executable found. See https://github.com/salesforcecli/sfdx-cli for install instructions")
+        echo.err("No sfdx executable found. See https://github.com/salesforcecli/sfdx-cli for install instructions")
         return
     end
     sfdx_runner.call_sfdx('--version', on_success)

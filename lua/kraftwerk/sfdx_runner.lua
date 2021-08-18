@@ -34,8 +34,7 @@ local function call_sfdx_raw(command, callback)
 
     local function on_exit(_, exitcode, _)
         if exitcode > 0 then
-            echo.error("Error: sfdx call unsuccessful")
-            echo.error(errors)
+            echo.err(errors)
             return
         end
         callback(result)
