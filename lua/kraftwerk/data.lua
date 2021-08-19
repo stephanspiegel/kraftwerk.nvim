@@ -23,8 +23,7 @@ local function build_query_command(query_string, format)
         format = "human"
     end
     if not util.contains_key(result_configs, format) then
-        echo.err("Unknown query result format: " .. format)
-        return
+        error("Unknown query result format: " .. format, 0)
     end
     local result_config = result_configs[format]
     local result_format = format
@@ -52,13 +51,21 @@ Sends a SOQL query to sfdx.
 @param startline The line where the range for the command starts
 @param endline The line where the range for the command ends
 @param format The format of the result to return: "csv", "human", "json"
+@todo implement explicit line ranges (multi and single line)
 
 ]]
 local function query(range, startline, endline, format)
     local query_string = util.get_visual_selection()
-    sfdx.call_sfdx_raw(build_query_command(query_string, format))
+    local ok, response, callback = pcall(build_query_command, query_string, format)
+    if ok then
+        sfdx.call_sfdx_raw(response, callback)
+    else
+        echo.err(response)
+    end
 end
 
 return {
-    query = query
+    query = query,
+    build_query_command = build_query_command
+
 }
