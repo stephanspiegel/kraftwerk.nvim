@@ -1,19 +1,20 @@
 local sfdx_runner = require("kraftwerk.sfdx_runner")
-local echo = require("kraftwerk.echo")
-
-local function sfdx_is_installed()
-    local is_installed = vim.fn.executable("sfdx")
-    if (is_installed == 0) then
-        return false
-    end
-    return true
-end
 
 local oldest_supported_version = "7.110.0"
 
+local function sfdx_is_installed()
+    local sfdx_executable = 'sfdx'
+    if vim.g.kraftwerk_sfdx_executable ~= null then
+        sfdx_executable = vim.g.kraftwerk_sfdx_executable
+    end
+    local is_installed = vim.fn.executable(sfdx_executable)
+    return (is_installed == 1)
+end
+
+
 local function version_parts(version)
     local major, minor, patch = string.match(version, "(%d+)%.(%d+)%.(%d+)")
-    return major, minor, patch 
+    return major, minor, patch
 end
 
 local function version_is_supported(version_number)
@@ -30,23 +31,39 @@ local function version_is_supported(version_number)
     end
 end
 
-local function on_success(result)
-    local version_number = string.gsub(result.cliVersion,"sfdx%-cli/", "")
-    if not version_is_supported(version_number) then
-        echo.err("Found sfdx version "..version_number.. ". Need version "..oldest_supported_version.." or higher.")
-        return
-    end
-    echo.info("sfdx version check ✓")
+local function report_ok(message)
+    vim.call("health#report_ok", message)
 end
 
-local function check_sfdx_version()
-    if not sfdx_is_installed() then
-        echo.err("No sfdx executable found. See https://github.com/salesforcecli/sfdx-cli for install instructions")
+local function report_error(message, suggestions)
+    vim.call("health#report_error", message, suggestions)
+end
+
+local function check_health()
+    vim.call("health#report_start", "Check sfdx-cli")
+    if sfdx_is_installed() then
+        report_ok("Found sfdx executable")
+    else
+        report_error("Couldn't find sfdx", {
+                "run in shell: npm install sfdx-cli --global",
+                "see install instructions: https://developer.salesforce.com/tools/sfdxcli",
+                "make sure sfdx is in your path environment variable",
+                "(optional): specify sfdx-cli executable along with full path in g:kraftwerk_sfdx_executable"
+            })
         return
     end
-    sfdx_runner.call_sfdx('--version', on_success)
+    local version_result = sfdx_runner.call_sfdx_sync('version')
+    local version_number = string.gsub(version_result.cliVersion,"sfdx%-cli/", "")
+    if version_is_supported(version_number) then
+        report_ok("Up to date")
+    else
+        report_error("Outdated version " .. version_number .." found. Must have at least " .. oldest_supported_version, {
+                "run in shell: sfdx update"
+        })
+        return
+    end
 end
 
 return {
-    check_sfdx_version = check_sfdx_version
+    check_health = check_health
 }
