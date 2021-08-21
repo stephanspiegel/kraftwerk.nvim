@@ -7,6 +7,18 @@ local function jsondecode(json_string)
     return vim.fn.json_decode(json_string)
 end
 
+local function build_command(command)
+    local user_parameter = ""
+    if(vim.g.kraftwerk_user ~= nil) then
+        user_parameter = " -u " .. vim.g.kraftwerk_user
+    end
+    local sfdx_executable = 'sfdx'
+    if vim.g.kraftwerk_sfdx_executable ~= null then
+        sfdx_executable = vim.g.kraftwerk_sfdx_executable
+    end
+    return  sfdx_executable .. " " .. command .. user_parameter
+end
+
 --[[--
 Calls sfdx without appending "--json".
 Calling code is responsible for parsing result.
@@ -40,13 +52,8 @@ local function call_sfdx_raw(command, callback)
         callback(result)
     end
 
-    local user_parameter = ""
-    if(vim.g.kraftwerk_user ~= nil) then
-        user_parameter = " -u " .. vim.g.kraftwerk_user
-    end
-
     local job_id = vim.fn.jobstart(
-        "sfdx " .. command .. user_parameter,
+        build_command(command),
         {
             on_stderr = on_stderr,
             on_stdout = on_stdout,
@@ -54,7 +61,29 @@ local function call_sfdx_raw(command, callback)
             stdout_buffered = true,
             stderr_buffered = true,
         }
-        )
+    )
+end
+
+--[[--
+Calls sfdx asynchronously. Only use if the calling context doesn't support callbacks
+]]
+local function call_sfdx_sync_raw(command)
+    local result = vim.fn.systemlist(build_command(command))
+    return result
+end
+
+local function json_decoder(data)
+    local json = table.concat(data, "\n")
+    local result = jsondecode(json)
+    return result
+end
+
+--[[--
+Calls sfdx asynchronously with the "--json" switch, and returns result as a table. Only use if the calling context doesn't support callbacks
+]]
+local function call_sfdx_sync(command)
+    local result = call_sfdx_sync_raw(command .. " --json")
+    return json_decoder(result)
 end
 
 --[[--
@@ -62,10 +91,7 @@ Calls sfdx with the "--json" switch and returns the result as a table.
 ]]
 local function call_sfdx(command, callback)
     local function json_callback(data)
-        dump(data)
-        local json = table.concat(data, "\n")
-        local result = jsondecode(json)
-        callback(result)
+        callback(json_decoder(data))
     end
     call_sfdx_raw(command .. " --json", json_callback)
 end
@@ -73,7 +99,8 @@ end
 return {
     jsondecode = jsondecode,
     call_sfdx = call_sfdx,
-    call_sfdx_raw = call_sfdx_raw
+    call_sfdx_raw = call_sfdx_raw,
+    call_sfdx_sync = call_sfdx_sync
 }
 
 
