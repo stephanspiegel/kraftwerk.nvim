@@ -1,8 +1,4 @@
 local util = require("kraftwerk.util")
-local sfdx = require("kraftwerk.sfdx_runner")
-local echo = require("kraftwerk.echo")
-local window_handler = require("kraftwerk.window_handler")
-
 local formatting = require("kraftwerk.formatting")
 
 local result_configs = {
@@ -16,15 +12,11 @@ local result_configs = {
     }
 }
 
-local function build_query_command(query_string, format)
+local function build_query_command(input)
+    local query_string = input.content
+    local format = input.format
     local sfdx_command = 'force:data:soql:query'
     sfdx_command = sfdx_command .. ' --query "' .. query_string .. '"'
-    if format == nil or format == "" then
-        format = "human"
-    end
-    if not util.contains_key(result_configs, format) then
-        error("Unknown query result format: " .. format, 0)
-    end
     local result_config = result_configs[format]
     local result_format = format
     if util.contains_key(result_config, "format") then
@@ -41,7 +33,13 @@ local function build_query_command(query_string, format)
         if processor ~= nil then
             result = processor(result)
         end
-        window_handler.open_result_buffer("__Query_Result__", result, file_type)
+        return {
+            result_buffer = {
+                content = result,
+                file_type = file_type,
+                title = "__Query_Result__"
+            }
+        }
     end
     return sfdx_command, query_callback
 end
@@ -54,18 +52,28 @@ Sends a SOQL query to sfdx.
 @todo implement explicit line ranges (multi and single line)
 
 ]]
-local function query(range, startline, endline, format)
+
+local function gather_query_input(range, startline, endline, format)
     local query_string = util.get_visual_selection()
-    local ok, response, callback = pcall(build_query_command, query_string, format)
-    if ok then
-        sfdx.call_sfdx_raw(response, callback)
-    else
-        echo.err(response)
+    if format == nil or format == "" then
+        format = "human"
     end
+    if not util.contains_key(result_configs, format) then
+        return { errors =
+            { messages =
+                { err = "Unknown query result format: " .. format }
+            }
+        }
+    end
+    return { content = query_string, format = format }
 end
 
-return {
-    query = query,
-    build_query_command = build_query_command
+local query_command = {
+    build_command = build_query_command,
+    gather_input = gather_query_input,
+    sfdx_call = 'call_sfdx_raw'
+}
 
+return {
+    query = query_command
 }

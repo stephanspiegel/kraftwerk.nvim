@@ -16,7 +16,8 @@ local function build_command(command)
     if vim.g.kraftwerk_sfdx_executable ~= null then
         sfdx_executable = vim.g.kraftwerk_sfdx_executable
     end
-    return  sfdx_executable .. " " .. command .. user_parameter
+    local command = sfdx_executable .. " " .. command .. user_parameter
+    return command
 end
 
 --[[--
@@ -45,7 +46,8 @@ local function call_sfdx_raw(command, callback)
     end
 
     local function on_exit(_, exitcode, _)
-        if exitcode > 0 then
+        local nextError = next(errors)
+        if nextError ~= nil and nextError ~= '' then
             echo.err(errors)
             return
         end
@@ -87,7 +89,9 @@ local function call_sfdx_sync(command)
 end
 
 --[[--
-Calls sfdx with the "--json" switch and returns the result as a table.
+Calls sfdx with the "--json" switch, the calls "callback" with the result as a table.
+@param command The sfdx command to call, ie. "force:source:push"
+@param callback Will be called with the result of running the sfdx command, as a table
 ]]
 local function call_sfdx(command, callback)
     local function json_callback(data)
@@ -102,5 +106,3 @@ return {
     call_sfdx_raw = call_sfdx_raw,
     call_sfdx_sync = call_sfdx_sync
 }
-
-

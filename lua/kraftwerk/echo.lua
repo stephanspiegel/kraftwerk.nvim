@@ -6,6 +6,9 @@ local function stringify(data)
 end
 
 local function echo_with_highlight(data, highlight_group)
+    if data == nil or data == '' then
+        return
+    end
     if highlight_group == nil then
         vim.api.nvim_echo({{stringify(data)}}, true, {})
     else
