@@ -3,7 +3,6 @@ local api = vim.api
 local buffer_handle_by_name = {}
 
 local function open_result_buffer(buffer_data)
-    dump(buffer_data)
     local buffer_name = buffer_data.title
     local buffer_content = buffer_data.content
     local file_type = buffer_data.file_type
