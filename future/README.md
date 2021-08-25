@@ -28,26 +28,57 @@ use { 'stephanspiegel/kraftwerk.vim', }
 
 ### Commands
 
-```viml
-:AuthWebLogin
-:DiffWithRemote -> custom
-:ForceApexClassCreate
-:ForceApexExecute
-:ForceApexLogList
-:ForceApexLogTail
-:ForceApexTestReport
-:ForceApexTestRun
-:ForceDataBulkDelete
-:ForceDataBulkUpsert
-:ForceDataSoqlQuery <format>
-:ForceOrgCreate
-:ForceOrgList
-:ForceOrgOpen
-:ForceSourceDeploy
-:ForceSourcePull
-:ForceSourcePush
-:ForceSourceRetrieve
-:ForceStaticresourceCreate
+### :AuthWebLogin
+* Inputs:
+    * username
+
+
+### :DiffWithRemote -> custom
+* Inputs:
+    * username (autocomplete)
+    * filename (implied)
+
+### :ForceApexClassCreate
+* Inputs:
+    * classname
+    * directory (autocomplete on dirs containing *.cls?)
+
+### :ForceApexExecute
+* Inputs:
+    * Selection OR range OR buffer content
+    * username (autocomplete)
+
+### :ForceApexLogList
+* Inputs:
+    * username (autocomplete)
+    * telescope/tui to select log?
+    
+### :ForceApexLogTail
+* Inputs:
+    * username (autocomplete)
+
+### :ForceApexTestReport
+* Inputs:
+    * username (autocomplete)
+    * report id (autocomplete? telescope?)
+    
+### :ForceApexTestRun
+* Inputs:
+    * test suite (autocomplete) OR test class (implied? autocomplete?) OR test method (cursor position? autocomplete?)
+    * username (autocomplete)
+### :ForceDataBulkDelete
+### :ForceDataBulkUpsert
+### :ForceDataSoqlQuery
+* Inputs:
+    * result format
+### :ForceOrgCreate
+### :ForceOrgList
+### :ForceOrgOpen
+### :ForceSourceDeploy
+### :ForceSourcePull
+### :ForceSourcePush
+### :ForceSourceRetrieve
+### :ForceStaticresourceCreate
 
 ### Suggested Mappings
 
