@@ -75,10 +75,34 @@ local function contains_value(tbl, test_value)
     return false
 end
 
+local function slice(tbl, start_index, end_index)
+    if end_index == nil then
+        end_index = #tbl
+    end
+    if start_index < 0 or end_index < 0 then
+        error("slice can't handle negative indexes")
+    end
+    if start_index >= end_index then
+        error("slice: start_index must be less than end_index")
+    end
+    if start_index > #tbl then
+        error("slice: start_index " .. start_index .. " is larger than table size "..#tbl)
+    end
+    if end_index > #tbl then
+        error("slice: end_index " .. end_index .. " is larger than table size "..#tbl)
+    end
+    local slice = {}
+    for i = start_index, end_index do
+        table.insert(slice, tbl[i])
+    end
+    return slice
+end
+
 return {
     get_visual_selection = get_visual_selection,
     get_current_line = get_current_line,
     contains = contains,
     contains_key = contains_key,
-    contains_value = contains_value
+    contains_value = contains_value,
+    slice = slice
 }

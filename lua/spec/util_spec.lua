@@ -199,4 +199,47 @@ Auch nach meinem Willen leben.
         end)
 
     end)
+
+    describe("slice", function() 
+
+        it("should return specified part of table", function()
+            local source_table = { 'a', 'b', 'c', 'd' }
+            local result_table = util.slice(source_table, 2, 3)
+            assert.same({'b', 'c'}, result_table)
+        end)
+
+        it("should return entire table", function()
+            local source_table = { 'a', 'b', 'c', 'd' }
+            local result_table = util.slice(source_table, 1, #source_table)
+            assert.same({'a', 'b', 'c', 'd'}, result_table)
+        end)
+
+        it("should return rest of table if no end_index given", function()
+            local source_table = { 'a', 'b', 'c', 'd' }
+            local result_table = util.slice(source_table, 3)
+            assert.same({'c', 'd'}, result_table)
+        end)
+
+        it("should error if negative start_index given", function()
+            local source_table = { 'a' }
+            assert.has.errors(function() util.slice(source_table, -1) end)
+        end)
+
+        it("should error if negative end_index given", function()
+            local source_table = { 'a' }
+            assert.has.errors(function() util.slice(source_table, 1, -1) end)
+        end)
+
+        it("should error if start_index is less than end_index", function()
+            local source_table = { 'a', 'b', 'c' }
+            assert.has.errors(function() util.slice(source_table, 2, 1) end)
+        end)
+
+        it("should error if start_index is greater than table size", function()
+            local source_table = { 'a', 'b', 'c' }
+            assert.has.errors(function() util.slice(source_table, 4) end)
+        end)
+
+    end)
+
 end)
