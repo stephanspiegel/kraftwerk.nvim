@@ -47,8 +47,10 @@ local function call_sfdx_raw(command, callback)
 
     local function on_exit(_, exitcode, _)
         local nextError = next(errors)
-        if nextError ~= nil and nextError ~= '' then
-            echo.err(errors)
+        if exitcode > 0 then
+            if nextError ~= nil and nextError ~= '' then
+                echo.err(errors)
+            end
             return
         end
         callback(result)

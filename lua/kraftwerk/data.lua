@@ -27,7 +27,12 @@ local function build_query_command(input)
     if util.contains_key(result_config, "processor") then
         processor = result_config.processor
     end
-    sfdx_command = sfdx_command .. "  --resultformat=" .. result_format
+    local result_format_clause = "  --resultformat=" .. result_format
+    local user_clause = ''
+    if util.contains_key(input, 'user') then
+        user_clause = ' --targetusername=' .. input.user
+    end
+    sfdx_command = sfdx_command .. result_format_clause .. user_clause
     local function query_callback(result)
         -- todo: add markdown table handling
         if processor ~= nil then
@@ -53,7 +58,7 @@ Sends a SOQL query to sfdx.
 
 ]]
 
-local function gather_query_input(range, startline, endline, format)
+local function validate_query_input(input)
     local query_string = util.get_visual_selection()
     if format == nil or format == "" then
         format = "human"
@@ -68,9 +73,31 @@ local function gather_query_input(range, startline, endline, format)
     return { content = query_string, format = format }
 end
 
+local expected_query_input = {
+    args = {
+        {
+            name = 'format',
+            valid_values = { 'human', 'csv', 'json', 'table'},
+            default_value = 'human',
+            required = false
+        },
+        {
+            name = 'user',
+            required = false,
+            complete = function() end
+        }
+    },
+    content = {
+        source = 'range_or_current_line',
+        format = 'text',
+        required = true
+    }
+}
+
 local query_command = {
+    expected_input = expected_query_input,
     build_command = build_query_command,
-    gather_input = gather_query_input,
+    validate_input = validate_query_input,
     sfdx_call = 'call_sfdx_raw'
 }
 

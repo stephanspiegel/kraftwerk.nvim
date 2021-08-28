@@ -41,8 +41,6 @@ end
 
 local function get_current_line()
     local cursorline, cursorcolumn = unpack(vim.api.nvim_win_get_cursor(0))
-    print("cursorline: ".. cursorline)
-    print("cursorcolumn: ".. cursorcolumn)
 end
 
 local function contains(tbl, test_value)
@@ -82,7 +80,7 @@ local function slice(tbl, start_index, end_index)
     if start_index < 0 or end_index < 0 then
         error("slice can't handle negative indexes")
     end
-    if start_index >= end_index then
+    if start_index > end_index then
         error("slice: start_index must be less than end_index")
     end
     if start_index > #tbl then

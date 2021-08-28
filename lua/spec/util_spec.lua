@@ -240,6 +240,11 @@ Auch nach meinem Willen leben.
             assert.has.errors(function() util.slice(source_table, 4) end)
         end)
 
+        it("should error if end_index is greater than table size", function()
+            local source_table = { 'a', 'b', 'c' }
+            assert.has.errors(function() util.slice(source_table, 2, 4) end)
+        end)
+
     end)
 
 end)
