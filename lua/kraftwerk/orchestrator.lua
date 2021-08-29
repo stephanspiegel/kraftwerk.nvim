@@ -12,7 +12,10 @@ M.call = function(module_name, command, ...)
         args = vim.split(command_args[4], '%s+')
     else -- not a range command, any args are user-entered 
         range = {}
-        args = vim.split(command_args[1], '%s+')
+        args = {}
+        if #command_args > 0 then
+            args = vim.split(command_args[1], '%s+')
+        end
     end
     local command_module = require('kraftwerk.'..module_name)[command]
     local expected_input = command_module.expected_input
