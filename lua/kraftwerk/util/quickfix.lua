@@ -2,7 +2,7 @@
 Module for working with the quickfix window
 @module quickfix
 ]]
-local util = require("kraftwerk.util")
+local list = require("kraftwerk.util.list")
 
 --[[
 Build a table that contains a list of quickfix errors, ready to send to quickfix window.
@@ -25,7 +25,7 @@ local function build_error_items(sfdx_result)
     for _, result in ipairs(sfdx_result.result) do
         local error_item = {}
         for sfdx_field, vim_field in pairs(sfdx_error_to_vim_error) do
-            if util.contains_key(result, sfdx_field) then
+            if list.contains_key(result, sfdx_field) then
                 error_item[vim_field] = result[sfdx_field]
                 if sfdx_field == 'problemType' then
                     error_item[vim_field] = sfdx_type_to_vim_type[result[sfdx_field]]

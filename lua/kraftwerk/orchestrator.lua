@@ -1,6 +1,6 @@
 local io_handler = require('kraftwerk.io_handler')
 local sfdx_runner = require('kraftwerk.sfdx_runner')
-local util = require('kraftwerk.util')
+local list = require('kraftwerk.util.list')
 
 local M = {}
 
@@ -8,7 +8,7 @@ M.call = function(module_name, command, ...)
     local command_args = {...}
     local range, args
     if #command_args == 4 then -- range command, first 3 arguments are about the range
-        range = util.slice(command_args, 1, 3)
+        range = list.slice(command_args, 1, 3)
         args = vim.split(command_args[4], '%s+')
     else -- not a range command, any args are user-entered
         range = {}
@@ -20,10 +20,10 @@ M.call = function(module_name, command, ...)
     local command_module = require('kraftwerk.'..module_name)[command]
     local expected_input = command_module.expected_input
     local input_result = io_handler.gather_input(expected_input, range, args)
-    if util.contains_key(input_result, 'messages') then
+    if list.contains_key(input_result, 'messages') then
         local messages = input_result.messages
         io_handler.output({ messages = messages })
-        if util.contains_key(messages, 'err') then
+        if list.contains_key(messages, 'err') then
             return
         end
     end

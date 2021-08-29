@@ -2,8 +2,8 @@
 Module for wrapping the force:source commands
 @module source
 ]]
-local util = require("kraftwerk.util")
-local quickfix = require("kraftwerk.quickfix")
+local list = require("kraftwerk.util.list")
+local quickfix = require("kraftwerk.util.quickfix")
 
 --[[
 Callback for the force:push command
@@ -13,7 +13,7 @@ local function push_callback(result)
     local io_data = { messages = {} }
     if result.status ~= 0 then
         io_data.messages.err = { result.commandName .. ": " .. result.message }
-        if util.contains_key(result, 'result') then
+        if list.contains_key(result, 'result') then
             io_data.quickfix = quickfix.build_error_items(result)
         end
     else
@@ -38,7 +38,7 @@ Call sfdx force:source:push.
 --]]
 local function build_push_command(input)
     local user_clause = ''
-    if util.contains_key(input, 'user') then
+    if list.contains_key(input, 'user') then
         user_clause = ' --targetusername=' .. input.user
     end
     local sfdx_command =  'force:source:push' .. user_clause

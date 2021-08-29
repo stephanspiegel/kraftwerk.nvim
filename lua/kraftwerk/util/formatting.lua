@@ -1,4 +1,4 @@
-local echo = require("kraftwerk.echo")
+local echo = require("kraftwerk.util.echo")
 
 local function build_table(json)
     echo.warn("Not implemented yet")

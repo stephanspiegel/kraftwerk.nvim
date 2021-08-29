@@ -1,26 +1,27 @@
-local util = require("kraftwerk.util")
+local list = require("kraftwerk.list")
+local buffer = require("kraftwerk.buffer")
 
-describe("util", function()
+describe("list", function()
     describe("contains()", function()
         it("should return 'true' if the table contains the element", function()
             local ghosts = {"Miss Jessel", "Susie Salmon", "Green Lady"}
-            assert.is_true(util.contains(ghosts, "Susie Salmon"))
+            assert.is_true(list.contains(ghosts, "Susie Salmon"))
         end)
         it("should return 'false' if the table doesn't contain the element", function()
             local ghosts = {"Miss Jessel", "Susie Salmon", "Green Lady"}
-            assert.is_false(util.contains(ghosts, "Controversy Jackson"))
+            assert.is_false(list.contains(ghosts, "Controversy Jackson"))
         end)
         it("should return 'false' if the test value is nil", function()
             local ghosts = {"Miss Jessel", "Susie Salmon", "Green Lady"}
-            assert.is_false(util.contains(ghosts, nil))
+            assert.is_false(list.contains(ghosts, nil))
         end)
         it("should return 'false' if the table is empty", function()
             local ghosts = {}
-            assert.is_false(util.contains(ghosts, "Miss Jessel"))
+            assert.is_false(list.contains(ghosts, "Miss Jessel"))
         end)
         it("should return 'false' if the table is nil", function()
             local ghosts = nil
-            assert.is_false(util.contains(ghosts, "Miss Jessel"))
+            assert.is_false(list.contains(ghosts, "Miss Jessel"))
         end)
     end)
 
@@ -31,7 +32,7 @@ describe("util", function()
                 plant = "Paris japonica",
                 fungus = "Gymnosporangium confusum"
             }
-            assert.is_true(util.contains_key(organisms, "plant"))
+            assert.is_true(list.contains_key(organisms, "plant"))
         end)
         it("should return 'false' if the table doesn't contain the key", function()
             local organisms = {
@@ -39,7 +40,7 @@ describe("util", function()
                 plant = "Paris japonica",
                 fungus = "Gymnosporangium confusum"
             }
-            assert.is_false(util.contains_key(organisms, "protist"))
+            assert.is_false(list.contains_key(organisms, "protist"))
         end)
         it("should return 'false' if the test value is nil", function()
             local organisms = {
@@ -47,15 +48,15 @@ describe("util", function()
                 plant = "Paris japonica",
                 fungus = "Gymnosporangium confusum"
             }
-            assert.is_false(util.contains_key(organisms, nil))
+            assert.is_false(list.contains_key(organisms, nil))
         end)
         it("should return 'false' if the table is empty", function()
             local organisms = {}
-            assert.is_false(util.contains_key(organisms, "plant"))
+            assert.is_false(list.contains_key(organisms, "plant"))
         end)
         it("should return 'false' if the table is nil", function()
             local organisms = nil
-            assert.is_false(util.contains_key(organisms, "plant"))
+            assert.is_false(list.contains_key(organisms, "plant"))
         end)
     end)
 
@@ -66,7 +67,7 @@ describe("util", function()
                 plant = "Paris japonica",
                 fungus = "Gymnosporangium confusum"
             }
-            assert.is_true(util.contains_value(organisms, "Paris japonica"))
+            assert.is_true(list.contains_value(organisms, "Paris japonica"))
         end)
         it("should return 'false' if the table doesn't contain the value", function()
             local organisms = {
@@ -74,7 +75,7 @@ describe("util", function()
                 plant = "Paris japonica",
                 fungus = "Gymnosporangium confusum"
             }
-            assert.is_false(util.contains_value(organisms, "Ursus arctos"))
+            assert.is_false(list.contains_value(organisms, "Ursus arctos"))
         end)
         it("should return 'false' if the test value is nil", function()
             local organisms = {
@@ -82,15 +83,15 @@ describe("util", function()
                 plant = "Paris japonica",
                 fungus = "Gymnosporangium confusum"
             }
-            assert.is_false(util.contains_value(organisms, nil))
+            assert.is_false(list.contains_value(organisms, nil))
         end)
         it("should return 'false' if the table is empty", function()
             local organisms = {}
-            assert.is_false(util.contains_value(organisms, "Paris japonica"))
+            assert.is_false(list.contains_value(organisms, "Paris japonica"))
         end)
         it("should return 'false' if the table is nil", function()
             local organisms = nil
-            assert.is_false(util.contains_value(organisms, "Paris japonica"))
+            assert.is_false(list.contains_value(organisms, "Paris japonica"))
         end)
     end)
 
@@ -112,7 +113,7 @@ Auch nach meinem Willen leben.
             ]]
             local bufnr = setUpBuffer(input, "txt")
             vim.api.nvim_command [[normal 3Gwwwvwe]]
-            assert.are_equal("seine Geister", util.get_visual_selection())
+            assert.are_equal("seine Geister", buffer.get_visual_selection())
             -- Leave visual mode for next test
             vim.cmd [[normal :esc<CR>]]
         end)
@@ -126,7 +127,7 @@ Auch nach meinem Willen leben.
             ]]
             local bufnr = setUpBuffer(input, "txt")
             vim.api.nvim_command [[normal wwwvj0e]]
-            assert.are_equal("Hexenmeister\nSich", util.get_visual_selection())
+            assert.are_equal("Hexenmeister\nSich", buffer.get_visual_selection())
             -- Leave visual mode for next test
             vim.cmd [[normal :esc<CR>]]
         end)
@@ -140,7 +141,7 @@ Auch nach meinem Willen leben.
             ]]
             local bufnr = setUpBuffer(input, "txt")
             vim.api.nvim_command [[normal jVj]]
-            assert.are_equal("Sich doch einmal wegbegeben!\nUnd nun sollen seine Geister", util.get_visual_selection())
+            assert.are_equal("Sich doch einmal wegbegeben!\nUnd nun sollen seine Geister", buffer.get_visual_selection())
             -- Leave visual mode for next test
             vim.cmd [[normal :esc<CR>]]
         end)
@@ -154,7 +155,7 @@ Auch nach meinem Willen leben.
             ]]
             local bufnr = setUpBuffer(input, "txt")
             vim.api.nvim_command [[normal 4Gevbb]]
-            assert.are_equal("Geister\nAuch", util.get_visual_selection())
+            assert.are_equal("Geister\nAuch", buffer.get_visual_selection())
             -- Leave visual mode for next test
             vim.cmd [[normal :esc<CR>]]
         end)
@@ -169,7 +170,7 @@ Auch nach meinem Willen leben.
             local bufnr = setUpBuffer(input, "txt")
             vim.api.nvim_command [[normal 3Gwvee]]
             vim.cmd [[normal :esc<CR>]]
-            assert.are_equal("nun sollen", util.get_visual_selection())
+            assert.are_equal("nun sollen", buffer.get_visual_selection())
         end)
 
         it("should return the multi-line visual selection after leaving visual mode", function()
@@ -182,7 +183,7 @@ Auch nach meinem Willen leben.
             local bufnr = setUpBuffer(input, "txt")
             vim.api.nvim_command [[normal wwwvj0e]]
             vim.cmd [[normal :esc<CR>]]
-            assert.are_equal("Hexenmeister\nSich", util.get_visual_selection())
+            assert.are_equal("Hexenmeister\nSich", buffer.get_visual_selection())
         end)
 
         it("should return the multi-line line-wise visual selection after leaving visual line mode", function()
@@ -195,7 +196,7 @@ Auch nach meinem Willen leben.
             local bufnr = setUpBuffer(input, "txt")
             vim.api.nvim_command [[normal jVj]]
             vim.cmd [[normal :esc<CR>]]
-            assert.are_equal("Sich doch einmal wegbegeben!\nUnd nun sollen seine Geister", util.get_visual_selection())
+            assert.are_equal("Sich doch einmal wegbegeben!\nUnd nun sollen seine Geister", buffer.get_visual_selection())
         end)
 
     end)
@@ -204,45 +205,45 @@ Auch nach meinem Willen leben.
 
         it("should return specified part of table", function()
             local source_table = { 'a', 'b', 'c', 'd' }
-            local result_table = util.slice(source_table, 2, 3)
+            local result_table = list.slice(source_table, 2, 3)
             assert.same({'b', 'c'}, result_table)
         end)
 
         it("should return entire table", function()
             local source_table = { 'a', 'b', 'c', 'd' }
-            local result_table = util.slice(source_table, 1, #source_table)
+            local result_table = list.slice(source_table, 1, #source_table)
             assert.same({'a', 'b', 'c', 'd'}, result_table)
         end)
 
         it("should return rest of table if no end_index given", function()
             local source_table = { 'a', 'b', 'c', 'd' }
-            local result_table = util.slice(source_table, 3)
+            local result_table = list.slice(source_table, 3)
             assert.same({'c', 'd'}, result_table)
         end)
 
         it("should error if negative start_index given", function()
             local source_table = { 'a' }
-            assert.has.errors(function() util.slice(source_table, -1) end)
+            assert.has.errors(function() list.slice(source_table, -1) end)
         end)
 
         it("should error if negative end_index given", function()
             local source_table = { 'a' }
-            assert.has.errors(function() util.slice(source_table, 1, -1) end)
+            assert.has.errors(function() list.slice(source_table, 1, -1) end)
         end)
 
         it("should error if start_index is less than end_index", function()
             local source_table = { 'a', 'b', 'c' }
-            assert.has.errors(function() util.slice(source_table, 2, 1) end)
+            assert.has.errors(function() list.slice(source_table, 2, 1) end)
         end)
 
         it("should error if start_index is greater than table size", function()
             local source_table = { 'a', 'b', 'c' }
-            assert.has.errors(function() util.slice(source_table, 4) end)
+            assert.has.errors(function() list.slice(source_table, 4) end)
         end)
 
         it("should error if end_index is greater than table size", function()
             local source_table = { 'a', 'b', 'c' }
-            assert.has.errors(function() util.slice(source_table, 2, 4) end)
+            assert.has.errors(function() list.slice(source_table, 2, 4) end)
         end)
 
     end)

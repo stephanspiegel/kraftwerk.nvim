@@ -1,7 +1,8 @@
-local util = require('kraftwerk.util')
-local echo = require('kraftwerk.echo')
-local quickfix = require('kraftwerk.quickfix')
-local window_handler = require('kraftwerk.window_handler')
+local list = require('kraftwerk.util.list')
+local buffer = require('kraftwerk.util.buffer')
+local echo = require('kraftwerk.util.echo')
+local quickfix = require('kraftwerk.util.quickfix')
+local window_handler = require('kraftwerk.util.window_handler')
 
 local function message_handler(message_data)
     for type, message in pairs(message_data) do
@@ -17,7 +18,7 @@ local handlers = {
 
 local function output(output_data)
     for key, value in pairs(output_data) do
-        if not util.contains_key(handlers, key) then
+        if not list.contains_key(handlers, key) then
             echo.err('io_handler received unknown key: '..key)
             return
         end
@@ -30,16 +31,16 @@ local function gather_args(expected_args, args)
     for index, arg_definition in ipairs(expected_args) do
         local arg_value = args[index]
         if arg_value == nil then
-            if util.contains_key(arg_definition, 'required') and arg_definition.required == true then
+            if list.contains_key(arg_definition, 'required') and arg_definition.required == true then
                 local err = 'Missing required argument: ' .. arg_definition.name
                 return { messages = { err = err }}
             end
-            if util.contains_key(arg_definition, 'default_value') then
+            if list.contains_key(arg_definition, 'default_value') then
                 arg_value = arg_definition.default_value
             end
         else
-            if util.contains_key(arg_definition, 'valid_values') then
-                if not util.contains_value(arg_definition.valid_values, arg_value) then
+            if list.contains_key(arg_definition, 'valid_values') then
+                if not list.contains_value(arg_definition.valid_values, arg_value) then
                     local err = '"' ..arg_value .. '" is not a valid value for ' .. arg_definition.name
                     return { messages = { err = err }}
                 end
@@ -53,14 +54,14 @@ local function gather_args(expected_args, args)
 end
 
 local function gather_content(content, range)
-    if not util.contains_key(content, 'source') then echo.err('"source" is a required field when "content" is specified')
+    if not list.contains_key(content, 'source') then echo.err('"source" is a required field when "content" is specified')
     end
     if content.source == 'range_or_current_line' then
         -- TODO: handle range, line, visual selection or current line <26-08-21, stephan.spiegel> --
-        return util.get_visual_selection()
+        return buffer.get_visual_selection()
     elseif content.source == 'range_or_current_file' then
         -- TODO: handle range, line, visual selection or current line <26-08-21, stephan.spiegel> --
-        return util.get_visual_selection()
+        return buffer.get_visual_selection()
     else
         echo.err('Unknown content source: '..content.source)
     end
@@ -68,10 +69,10 @@ end
 
 local function gather_input(expected_input, range, args)
     local input = {}
-    if util.contains_key(expected_input, 'args') then
+    if list.contains_key(expected_input, 'args') then
         input = gather_args(expected_input.args, args)
     end
-    if util.contains_key(expected_input, 'content') then
+    if list.contains_key(expected_input, 'content') then
         input['content'] = gather_content(expected_input.content, range)
     end
     return input

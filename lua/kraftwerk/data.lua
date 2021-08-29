@@ -1,5 +1,5 @@
-local util = require("kraftwerk.util")
-local formatting = require("kraftwerk.formatting")
+local list = require("kraftwerk.util.list")
+local formatting = require("kraftwerk.util.formatting")
 
 local result_configs = {
     csv = { filetype = "csv" },
@@ -19,17 +19,17 @@ local function build_query_command(input)
     sfdx_command = sfdx_command .. ' --query "' .. query_string .. '"'
     local result_config = result_configs[format]
     local result_format = format
-    if util.contains_key(result_config, "format") then
+    if list.contains_key(result_config, "format") then
         result_format = result_config.format
     end
     local file_type = result_config.filetype
     local processor
-    if util.contains_key(result_config, "processor") then
+    if list.contains_key(result_config, "processor") then
         processor = result_config.processor
     end
     local result_format_clause = "  --resultformat=" .. result_format
     local user_clause = ''
-    if util.contains_key(input, 'user') then
+    if list.contains_key(input, 'user') then
         user_clause = ' --targetusername=' .. input.user
     end
     sfdx_command = sfdx_command .. result_format_clause .. user_clause
@@ -59,11 +59,11 @@ Sends a SOQL query to sfdx.
 ]]
 
 local function validate_query_input(input)
-    local query_string = util.get_visual_selection()
+    local query_string = buffer.get_visual_selection()
     if format == nil or format == "" then
         format = "human"
     end
-    if not util.contains_key(result_configs, format) then
+    if not list.contains_key(result_configs, format) then
         return { errors =
             { messages =
                 { err = "Unknown query result format: " .. format }

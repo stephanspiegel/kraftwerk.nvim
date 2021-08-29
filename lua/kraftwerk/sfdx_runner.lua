@@ -1,4 +1,4 @@
-local echo = require("kraftwerk.echo")
+local echo = require("kraftwerk.util.echo")
 
 local function jsondecode(json_string)
     if json_string == "" or json_string == nil then
