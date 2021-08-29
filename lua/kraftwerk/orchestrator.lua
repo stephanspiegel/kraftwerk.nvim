@@ -17,7 +17,7 @@ M.call = function(module_name, command, ...)
             args = vim.split(command_args[1], '%s+')
         end
     end
-    local command_module = require('kraftwerk.'..module_name)[command]
+    local command_module = require('kraftwerk.commands.'..module_name)[command]
     local expected_input = command_module.expected_input
     local input_result = io_handler.gather_input(expected_input, range, args)
     if functor.contains_key(input_result, 'messages') then
