@@ -2,7 +2,6 @@
 Module for wrapping the force:source commands
 @module source
 ]]
--- local echo = require("kraftwerk.echo")
 local util = require("kraftwerk.util")
 local quickfix = require("kraftwerk.quickfix")
 
@@ -37,12 +36,26 @@ end
 --[[--
 Call sfdx force:source:push.
 --]]
-local function build_push_command()
-    return 'force:source:push', push_callback
+local function build_push_command(input)
+    local user_clause = ''
+    if util.contains_key(input, 'user') then
+        user_clause = ' --targetusername=' .. input.user
+    end
+    local sfdx_command =  'force:source:push' .. user_clause
+    return sfdx_command, push_callback
 end
 
+local expected_push_input = {
+    args = {
+        {
+            name = 'user',
+            required = false,
+            complete = function() end
+        }
+    }
+}
+
 local function pull_callback(result)
-    echo.info(result)
 end
 
 --[[
@@ -59,8 +72,9 @@ local pull_command = {
 }
 
 local push_command  = {
+    expected_input = expected_push_input,
     build_command = build_push_command,
-    gather_input = function() return {} end,
+    validate_input = function() end,
     sfdx_call = 'call_sfdx'
 }
 

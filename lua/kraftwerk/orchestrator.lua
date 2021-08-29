@@ -10,7 +10,7 @@ M.call = function(module_name, command, ...)
     if #command_args == 4 then -- range command, first 3 arguments are about the range
         range = util.slice(command_args, 1, 3)
         args = vim.split(command_args[4], '%s+')
-    else -- not a range command, any args are user-entered 
+    else -- not a range command, any args are user-entered
         range = {}
         args = {}
         if #command_args > 0 then
