@@ -1,4 +1,4 @@
-local list = require("kraftwerk.util.list")
+local functor = require("kraftwerk.util.functor")
 local formatting = require("kraftwerk.util.formatting")
 
 local result_configs = {
@@ -19,17 +19,17 @@ local function build_query_command(input)
     sfdx_command = sfdx_command .. ' --query "' .. query_string .. '"'
     local result_config = result_configs[format]
     local result_format = format
-    if list.contains_key(result_config, "format") then
+    if functor.contains_key(result_config, "format") then
         result_format = result_config.format
     end
     local file_type = result_config.filetype
     local processor
-    if list.contains_key(result_config, "processor") then
+    if functor.contains_key(result_config, "processor") then
         processor = result_config.processor
     end
     local result_format_clause = "  --resultformat=" .. result_format
     local user_clause = ''
-    if list.contains_key(input, 'user') then
+    if functor.contains_key(input, 'user') then
         user_clause = ' --targetusername=' .. input.user
     end
     sfdx_command = sfdx_command .. result_format_clause .. user_clause
@@ -63,7 +63,7 @@ local function validate_query_input(input)
     if format == nil or format == "" then
         format = "human"
     end
-    if not list.contains_key(result_configs, format) then
+    if not functor.contains_key(result_configs, format) then
         return { errors =
             { messages =
                 { err = "Unknown query result format: " .. format }
