@@ -51,9 +51,24 @@ local function slice(tbl, start_index, end_index)
     return slice
 end
 
+local function map(fn, list)
+    local function curried_function(things)
+        local mapped = {}
+        for index, thing in pairs(things) do
+            mapped[index] = fn(thing)
+        end
+        return mapped
+    end
+    if list == nil then 
+        return curried_function
+    end
+    return curried_function(list)
+end
+
 return {
     contains = contains,
     contains_key = contains_key,
     contains_value = contains_value,
-    slice = slice
+    slice = slice,
+    map = map
 }

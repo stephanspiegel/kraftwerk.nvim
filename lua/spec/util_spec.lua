@@ -1,7 +1,7 @@
 local functor = require("kraftwerk.util.functor")
 local buffer = require("kraftwerk.util.buffer")
 
-describe("list", function()
+describe("functor", function()
     describe("contains()", function()
         it("should return 'true' if the table contains the element", function()
             local ghosts = {"Miss Jessel", "Susie Salmon", "Green Lady"}
@@ -248,4 +248,28 @@ Auch nach meinem Willen leben.
 
     end)
 
+    describe('map', function()
+
+        it("should apply passed in function to each element", function()
+            local list = {2,3,4}
+            local function double(x) return x*2 end
+            assert.same({4,6,8}, functor.map(double, list))
+        end)
+
+        it('should return empty list for empty list passed in', function()
+            local list = {}
+            local function double(x) return x*2 end
+            assert.same({}, functor.map(double, list))
+        end)
+
+        it('should curry function if no table passed in', function()
+            local list = {2,3,4}
+            local function double(x) return x*2 end
+            local curried_function = functor.map(double)
+            assert.same({4,6,8}, curried_function(list))
+        end)
+
+    end)
+
+    
 end)
