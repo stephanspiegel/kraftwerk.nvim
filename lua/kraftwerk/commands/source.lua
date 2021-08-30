@@ -38,10 +38,14 @@ Call sfdx force:source:push.
 --]]
 local function build_push_command(input)
     local user_clause = ''
+    local force_clause = ''
     if functor.contains_key(input, 'user') then
         user_clause = ' --targetusername=' .. input.user
     end
-    local sfdx_command =  'force:source:push' .. user_clause
+    if input.bang then
+        force_clause = ' --forceoverwrite'
+    end
+    local sfdx_command =  'force:source:push' .. user_clause .. force_clause
     return sfdx_command, push_callback
 end
 
@@ -52,7 +56,8 @@ local expected_push_input = {
             required = false,
             complete = function() end
         }
-    }
+    },
+    bang = true
 }
 
 local function pull_callback(result)

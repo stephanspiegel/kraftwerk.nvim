@@ -5,6 +5,15 @@ local functor = require('kraftwerk.util.functor')
 local call = function(module_name, command, ...)
     local command_args = {...}
     local range, args
+    local bang = false
+    local command_module = require('kraftwerk.commands.'..module_name)[command]
+    local expected_input = command_module.expected_input
+    if functor.contains_key(expected_input, 'bang') 
+            and expected_input.bang 
+    then
+            bang = command_args[1] == '!'
+            command_args = functor.slice(command_args, 2)
+    end
     if #command_args == 4 then -- range command, first 3 arguments are about the range
         range = functor.slice(command_args, 1, 3)
         args = vim.split(command_args[4], '%s+')
@@ -15,9 +24,7 @@ local call = function(module_name, command, ...)
             args = vim.split(command_args[1], '%s+')
         end
     end
-    local command_module = require('kraftwerk.commands.'..module_name)[command]
-    local expected_input = command_module.expected_input
-    local input_result = io_handler.gather_input(expected_input, range, args)
+    local input_result = io_handler.gather_input(expected_input, bang, range, args)
     if functor.contains_key(input_result, 'messages') then
         local messages = input_result.messages
         io_handler.output({ messages = messages })
@@ -40,6 +47,12 @@ local function build_command_string(command_definition)
     local command = command_definition.meta.name
     local expected_input = command_definition.expected_input
     local args = { "'"..module_name.."'", "'"..command.."'"}
+    if functor.contains_key(expected_input, 'bang') then
+        if expected_input.bang == true then
+            table.insert(command_parts, '-bang')
+            table.insert(args, '<q-bang>')
+        end
+    end
     if functor.contains_key(expected_input, 'content') then
         local content_source = expected_input.content.source
         if content_source == 'range_or_current_line' then
@@ -52,12 +65,6 @@ local function build_command_string(command_definition)
             table.insert(args, '<range>')
             table.insert(args, '<line1>')
             table.insert(args, '<line2>')
-        end
-    end
-    if functor.contains_key(expected_input, 'bang') then
-        if expected_input.bang == true then
-            table.insert(command_parts, '-bang')
-            table.insert(args, '<bang>')
         end
     end
     if functor.contains_key(expected_input, 'args') then

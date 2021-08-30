@@ -67,13 +67,16 @@ local function gather_content(content, range)
     end
 end
 
-local function gather_input(expected_input, range, args)
+local function gather_input(expected_input, bang, range, args)
     local input = {}
     if functor.contains_key(expected_input, 'args') then
         input = gather_args(expected_input.args, args)
     end
     if functor.contains_key(expected_input, 'content') then
         input['content'] = gather_content(expected_input.content, range)
+    end
+    if functor.contains_key(expected_input, 'bang') then
+        input.bang = bang
     end
     return input
 end
