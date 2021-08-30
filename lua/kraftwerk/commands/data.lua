@@ -58,21 +58,6 @@ Sends a SOQL query to sfdx.
 
 ]]
 
-local function validate_query_input(input)
-    local query_string = buffer.get_visual_selection()
-    if format == nil or format == "" then
-        format = "human"
-    end
-    if not functor.contains_key(result_configs, format) then
-        return { errors =
-            { messages =
-                { err = "Unknown query result format: " .. format }
-            }
-        }
-    end
-    return { content = query_string, format = format }
-end
-
 local expected_query_input = {
     args = {
         {
@@ -95,9 +80,13 @@ local expected_query_input = {
 }
 
 local query_command = {
+    meta = {
+        module = 'data',
+        name = 'query',
+        command_name = 'ForceDataSoqlQuery'
+    },
     expected_input = expected_query_input,
     build_command = build_query_command,
-    validate_input = validate_query_input,
     sfdx_call = 'call_sfdx_raw'
 }
 

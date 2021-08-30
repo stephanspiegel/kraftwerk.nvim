@@ -1,8 +1,8 @@
-local cmd = vim.cmd
+local orchestrator = require('kraftwerk.orchestrator')
 
 local function define_commands()
-    cmd("command! -range=% -nargs=* ForceDataSoqlQuery lua require'kraftwerk.orchestrator'.call('data', 'query', <range>, <line1>, <line2>, <q-args>)")
-    cmd("command! -nargs=? ForceSourcePush lua require'kraftwerk.orchestrator'.call('source', 'push', <q-args>)")
+    orchestrator.register('data', 'query')
+    orchestrator.register('source', 'push')
 end
 
 local function setup()

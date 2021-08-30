@@ -66,12 +66,22 @@ local function build_pull_command()
 end
 
 local pull_command = {
+    meta = {
+        module = 'source',
+        name = 'pull',
+        command_name = 'ForceSourcePull'
+    },
     build_command = build_pull_command,
     gather_input = function() return {} end,
     sfdx_call = 'call_sfdx'
 }
 
 local push_command  = {
+    meta = {
+        module = 'source',
+        name = 'push',
+        command_name = 'ForceSourcePush'
+    },
     expected_input = expected_push_input,
     build_command = build_push_command,
     validate_input = function() end,

@@ -54,7 +54,6 @@ local function call_sfdx_raw(command, callback)
                 return
             end
         end
-        print('calling callback')
         callback(result)
     end
 
