@@ -1,11 +1,5 @@
 local echo = require("kraftwerk.util.echo")
-
-local function jsondecode(json_string)
-    if json_string == "" or json_string == nil then
-        return ""
-    end
-    return vim.fn.json_decode(json_string)
-end
+local json = require('kraftwerk.util.json')
 
 local function build_command(command)
     local user_parameter = ""
@@ -78,8 +72,8 @@ local function call_sfdx_sync_raw(command)
 end
 
 local function json_decoder(data)
-    local json = table.concat(data, "\n")
-    local result = jsondecode(json)
+    local json_data = table.concat(data, "\n")
+    local result = json.decode(json_data)
     return result
 end
 
@@ -104,7 +98,6 @@ local function call_sfdx(command, callback)
 end
 
 return {
-    jsondecode = jsondecode,
     call_sfdx = call_sfdx,
     call_sfdx_raw = call_sfdx_raw,
     call_sfdx_sync = call_sfdx_sync
