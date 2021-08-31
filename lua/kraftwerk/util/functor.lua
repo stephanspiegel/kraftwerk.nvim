@@ -28,6 +28,10 @@ local function contains_value(tbl, test_value)
     return false
 end
 
+local function is_null_or_empty(tbl)
+    return tbl == nil or next(tbl) == nil
+end
+
 local function slice(tbl, start_index, end_index)
     if end_index == nil then
         end_index = #tbl
@@ -59,16 +63,26 @@ local function map(fn, list)
         end
         return mapped
     end
-    if list == nil then 
+    if list == nil then
         return curried_function
     end
     return curried_function(list)
+end
+
+local function keys(tbl)
+    local table_keys = {}
+    for key, _ in pairs(tbl) do
+        table.insert(table_keys, key)
+    end
+    return table_keys
 end
 
 return {
     contains = contains,
     contains_key = contains_key,
     contains_value = contains_value,
+    is_null_or_empty = is_null_or_empty,
+    map = map,
     slice = slice,
-    map = map
+    keys = keys
 }
