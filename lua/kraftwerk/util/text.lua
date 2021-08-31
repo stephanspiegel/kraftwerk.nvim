@@ -3,6 +3,8 @@ Module for string convenience utilities
 @module quickfix
 ]]
 
+local functor = require('kraftwerk.util.functor')
+
 --[[
 Does the text start with a given prefix?
 @tparam prefix string The prefix to look for
@@ -37,8 +39,18 @@ local function is_blank(text)
     return text == nil or trim(text) == ''
 end
 
+local function split(text, separator)
+    if separator == nil then separator = '%s' end
+    local parts = {}
+    for str in text:gmatch("([^"..separator.."]+)") do
+        table.insert(parts, str)
+    end
+    return parts
+end
+
 return {
     starts_with = starts_with,
     is_blank = is_blank,
-    trim = trim
+    trim = trim,
+    split = split
 }

@@ -53,4 +53,19 @@ describe('text', function()
 
     end)
 
+    describe('split', function()
+
+        it('should return list of words', function()
+            local input = 'A small step for a man'
+            local expected = { 'A', 'small', 'step', 'for', 'a', 'man'}
+            assert.same(expected, text.split(input))
+        end)
+
+        it('should split on comma', function()
+            local input = 'bainberry,chokenut,moonrock,kippers'
+            local expected = {'bainberry', 'chokenut', 'moonrock', 'kippers'}
+            assert.same(expected, text.split(input, ','))
+        end)
+    end)
+
 end)
