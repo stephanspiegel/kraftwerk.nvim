@@ -111,7 +111,7 @@ describe('orchestrator', function()
                 },
             }
             local built_command = orchestrator.build_command_string(command)
-            assert.are_equal("command! -range=% -bang -nargs=* ForceDataSoqlQuery lua require'kraftwerk.orchestrator'.call('data', 'query', <range>, <line1>, <line2>, <bang>, <q-args>)", built_command)
+            assert.are_equal("command! -bang -range=% -nargs=* ForceDataSoqlQuery lua require'kraftwerk.orchestrator'.call('data', 'query', <q-bang>, <range>, <line1>, <line2>, <q-args>)", built_command)
         end)
 
     end)

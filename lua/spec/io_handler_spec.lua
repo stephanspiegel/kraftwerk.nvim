@@ -11,7 +11,7 @@ describe('io_handler', function()
                     name = 'requiredArgument'
                 }
             }
-            local result = io_handler.gather_input({args = expected_args}, nil, nil)
+            local result = io_handler.gather_input({args = expected_args}, nil, nil, nil)
             local message_produced = result.messages.err
             assert.are_equal('Missing required argument: requiredArgument', message_produced)
         end)
@@ -24,7 +24,7 @@ describe('io_handler', function()
                 }
             }
             local range_args = {}
-            local result = io_handler.gather_input({args = expected_args}, range_args, {'d'})
+            local result = io_handler.gather_input({args = expected_args}, nil, range_args, {'d'})
             local message_produced = result.messages.err
             assert.are_equal('"d" is not a valid value for constrainedArgument', message_produced)
         end)
@@ -47,7 +47,7 @@ describe('io_handler', function()
                     name = 'fruit'
                 }
             }
-            local result = io_handler.gather_input({args=expected_args}, nil, {'orange'})
+            local result = io_handler.gather_input({args=expected_args}, nil, nil, {'orange'})
             assert.are_equal('orange', result.fruit)
         end)
 

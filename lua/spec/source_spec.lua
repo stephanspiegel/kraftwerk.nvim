@@ -1,18 +1,25 @@
-local source = require('kraftwerk.source')
-local sfdx_runner = require('kraftwerk.sfdx_runner')
+local source = require('kraftwerk.commands.source')
+local json = require('kraftwerk.util.json')
 
 describe("source", function()
+
     describe("push", function()
+
         describe("build_command", function()
+
             it("should build the command correctly", function()
-                local sfdx_command, _ = source.push.build_command()
+                local input = {}
+                local sfdx_command, _ = source.push.build_command(input)
                 assert.are_equal('force:source:push', sfdx_command)
             end)
+
         end)
+
         describe("callback", function()
 
             it("should warn if nothing to push", function()
-                local _, callback = source.push.build_command()
+                local input = {}
+                local _, callback = source.push.build_command(input)
                 local result = {
                     status = 0,
                     result = {
@@ -28,7 +35,8 @@ describe("source", function()
             end)
 
             it("should show any errors returned", function()
-                local _, callback = source.push.build_command()
+                local input = {}
+                local _, callback = source.push.build_command(input)
                 local result = {
                     status = 1,
                     name = "RequiresProjectError",
@@ -46,8 +54,9 @@ describe("source", function()
             end)
 
             it("should show compile errors in quickfix", function()
-                local _, callback = source.push.build_command()
-                local result = sfdx_runner.jsondecode [[
+                local input = {}
+                local _, callback = source.push.build_command(input)
+                local result = json.decode [[
 {
   "status": 1,
   "result": [
@@ -99,8 +108,9 @@ describe("source", function()
             end)
 
             it("should show pushed metadata when successful", function()
-                local _, callback = source.push.build_command()
-                local result = sfdx_runner.jsondecode [[
+                local input = {}
+                local _, callback = source.push.build_command(input)
+                local result = json.decode [[
 {
   "status": 0,
   "result": {

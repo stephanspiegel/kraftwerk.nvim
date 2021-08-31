@@ -1,4 +1,4 @@
-local data = require("kraftwerk.data")
+local data = require("kraftwerk.commands.data")
 
 describe("data", function()
 
