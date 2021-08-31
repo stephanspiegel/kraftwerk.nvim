@@ -1,6 +1,7 @@
 local io_handler = require('kraftwerk.io_handler')
 local sfdx_runner = require('kraftwerk.sfdx_runner')
 local functor = require('kraftwerk.util.functor')
+local text = require('kraftwerk.util.text')
 
 local call = function(module_name, command, ...)
     local command_args = {...}
@@ -8,11 +9,9 @@ local call = function(module_name, command, ...)
     local bang = false
     local command_module = require('kraftwerk.commands.'..module_name)[command]
     local expected_input = command_module.expected_input
-    if functor.contains_key(expected_input, 'bang') 
-            and expected_input.bang 
-    then
-            bang = command_args[1] == '!'
-            command_args = functor.slice(command_args, 2)
+    if functor.contains_key(expected_input, 'bang') and expected_input.bang then
+        bang = command_args[1] == '!'
+        command_args = functor.slice(command_args, 2)
     end
     if #command_args == 4 then -- range command, first 3 arguments are about the range
         range = functor.slice(command_args, 1, 3)
@@ -41,7 +40,7 @@ local call = function(module_name, command, ...)
     sfdx_runner[sfdx_call](sfdx_command, orchestrator_callback)
 end
 
-local function build_command_string(command_definition)
+local function build_command_string(command_definition, completion_function_name)
     local command_parts = {'command!'}
     local module_name = command_definition.meta.module
     local command = command_definition.meta.name
@@ -69,6 +68,9 @@ local function build_command_string(command_definition)
     end
     if functor.contains_key(expected_input, 'args') then
         table.insert(command_parts, '-nargs=*')
+        if completion_function_name ~= nil then
+            table.insert(command_parts, "-complete=custom,v:lua."..completion_function_name)
+        end
         table.insert(args, '<q-args>')
     end
     table.insert(command_parts, command_definition.meta.command_name)
@@ -77,13 +79,48 @@ local function build_command_string(command_definition)
     return table.concat(command_parts, ' ')
 end
 
-local function build_command_string_from_module_and_name(module_name, name)
+local function register_completion(command_definition)
+    if functor.is_null_or_empty(command_definition.expected_input)
+        or functor.is_null_or_empty(command_definition.expected_input.args) then
+        return ''
+    end
+    local module_name = command_definition.meta.module
+    local command = command_definition.meta.name
+    local completion_function_name = module_name .. '_' .. command
+    local completion_function_full_name = 'kraftwerk.command_completion.' .. completion_function_name
+    local completion_functions = {}
+    for _, arg in ipairs(command_definition.expected_input.args) do
+        if functor.contains_key(arg, 'valid_values') then
+            table.insert(completion_functions, function()
+                return arg.valid_values
+            end)
+        elseif functor.contains_key(arg, 'complete') then
+            table.insert(completion_functions, arg.complete)
+        else
+            table.insert(completion_functions, function() return {} end)
+        end
+    end
+
+    _G.kraftwerk.command_completion[completion_function_name] = function(arg_lead, cmd_line, cursor_pos)
+        -- find which argument the cursor is on
+        local cmd_line_to_cursor = string.sub(cmd_line, 1, cursor_pos)
+        local cmd_line_words = text.split(cmd_line_to_cursor)
+        local argument_pos = #cmd_line_words
+        local candidates = completion_functions[argument_pos](arg_lead, cmd_line, cursor_pos)
+        return table.concat(candidates, '\n')
+    end
+    return completion_function_full_name
+end
+
+local function get_command_definition(module_name, name)
     local command_definition = require('kraftwerk.commands.'..module_name)[name]
-    return build_command_string(command_definition)
+    return command_definition
 end
 
 local function register(module_name, command)
-    local command_string = build_command_string_from_module_and_name(module_name, command)
+    local command_definition = get_command_definition(module_name, command)
+    local completion_function_name = register_completion(command_definition)
+    local command_string = build_command_string(command_definition, completion_function_name)
     vim.cmd(command_string)
 end
 

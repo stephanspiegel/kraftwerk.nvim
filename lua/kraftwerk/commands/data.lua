@@ -1,5 +1,6 @@
 local functor = require("kraftwerk.util.functor")
 local formatting = require("kraftwerk.util.formatting")
+local completion = require('kraftwerk.util.completion')
 
 local result_configs = {
     csv = { filetype = "csv" },
@@ -69,7 +70,7 @@ local expected_query_input = {
         {
             name = 'user',
             required = false,
-            complete = function() end
+            complete = completion.user
         }
     },
     content = {

@@ -4,6 +4,7 @@ Module for wrapping the force:source commands
 ]]
 local functor = require("kraftwerk.util.functor")
 local quickfix = require("kraftwerk.util.quickfix")
+local completion = require('kraftwerk.util.completion')
 
 --[[
 Callback for the force:push command
@@ -52,9 +53,9 @@ end
 local expected_push_input = {
     args = {
         {
+            complete = completion.user,
             name = 'user',
-            required = false,
-            complete = function() end
+            required = false
         }
     },
     bang = true

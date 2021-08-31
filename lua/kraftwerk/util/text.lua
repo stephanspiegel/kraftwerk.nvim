@@ -3,8 +3,6 @@ Module for string convenience utilities
 @module quickfix
 ]]
 
-local functor = require('kraftwerk.util.functor')
-
 --[[
 Does the text start with a given prefix?
 @tparam prefix string The prefix to look for
