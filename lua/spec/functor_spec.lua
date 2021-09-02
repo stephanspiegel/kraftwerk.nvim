@@ -183,4 +183,127 @@ describe("functor", function()
 
     end)
 
+    describe('fold', function()
+
+        it('should be able to sum a list of integers', function()
+            local list = { 1,2,3 }
+            local sum = function(x, acc) return acc + x end
+            assert.are_equal(6, functor.fold(sum, list, 0))
+        end)
+
+        it('should accept an init value', function()
+            local list = { 1,2,3 }
+            local sum = function(x, acc) return acc + x end
+            assert.are_equal(10, functor.fold(sum, list, 4))
+        end)
+
+        it('should use first value as init if no init supplied', function()
+            local list = {'a', 'b', 'c'}
+            local keep_init = function(acc) return acc end
+            assert.are_equal('a', functor.fold(keep_init, list))
+        end)
+
+        it('should wrap non-table input as table', function()
+            local function sum(x, acc) return acc + x end
+            assert.are_equal(5, functor.fold(sum, 3, 2))
+        end)
+
+    end)
+
+    describe('intersperse', function()
+
+        it('should return an empty list for an empty list', function()
+            assert.same({}, functor.intersperse('a', {}))
+        end)
+
+        it("should return the list unchanged if it's a singleton", function()
+            assert.same({'a'}, functor.intersperse('b', {'a'}))
+        end)
+
+        it('should return a list with the specified item between each original list item', function()
+            local item = '-'
+            local list = {'a', 'b', 'c'}
+            local result = functor.intersperse(item, list)
+            assert.same({'a', '-', 'b', '-', 'c'}, result)
+        end)
+    end)
+
+    describe('filter', function()
+
+        it('should return empty list for empty list', function()
+            local predicate = function(x) return x == 'b' end
+            assert.same({}, functor.filter(predicate, {}))
+        end)
+
+        it('should return element for which condition is true', function()
+            local predicate = function(x) return x == 'b' end
+            assert.same({'b'}, functor.filter(predicate, {'a', 'b', 'c'}))
+        end)
+
+
+        it('should return all elements for which condition is true', function()
+            local predicate = function(x) return x % 2 == 0 end
+            assert.same({2,4}, functor.filter(predicate, {1,2,3,4,5}))
+        end)
+
+    end)
+
+    describe('flatmap', function()
+
+        it('should return empty list for empty list', function()
+            local function func(x) return x*2 end
+            assert.same({}, functor.flatmap(func, {}))
+        end)
+
+        it('should return singleton from singleton list', function()
+            local function func(x) return x*2 end
+            assert.same({6}, functor.flatmap(func, {3}))
+        end)
+
+        it('should return flat map from nested input', function()
+            local function func(x) return {x*2} end
+            assert.same({6,12}, functor.flatmap(func, {3,6}))
+        end)
+
+    end)
+
+    describe('append()', function()
+
+        it('should not modify original list', function()
+            local orig = {7,8}
+            functor.append(orig, 9)
+            assert.same(orig, {7,8})
+        end)
+
+        it('should add element to end of list', function()
+            assert.same({5,7,9}, functor.append({5,7}, 9))
+        end)
+
+    describe('concat()', function()
+
+        it('should return empty list for two nil inputs', function()
+            assert.same({}, functor.concat())
+        end)
+
+        it('should return empty list for two empty inputs', function()
+            assert.same({}, functor.concat({},{}))
+        end)
+
+        it('should add two lists together', function()
+            assert.same({36,42,69,107}, functor.concat({36,42},{69,107}))
+        end)
+
+        it('should not modify original lists', function()
+            local first_list = {36,42}
+            local second_list = {69,107}
+            functor.concat(first_list, second_list)
+            assert.same(first_list, {36,42})
+            assert.same(second_list, {69,107})
+        end)
+
+    end)
+
+
+    end)
+
 end)
