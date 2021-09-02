@@ -5,9 +5,7 @@ local quickfix = require('kraftwerk.util.quickfix')
 local window_handler = require('kraftwerk.util.window_handler')
 
 local function message_handler(message_data)
-    for type, message in pairs(message_data) do
-        echo[type](message)
-    end
+    echo.multiline(message_data)
 end
 
 local handlers = {
