@@ -7,6 +7,7 @@ _G.kraftwerk = {
 local function define_commands()
     orchestrator.register('data', 'query')
     orchestrator.register('source', 'push')
+    orchestrator.register('apex', 'testrun')
 end
 
 local function define_globals()
