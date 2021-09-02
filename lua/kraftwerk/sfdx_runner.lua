@@ -43,7 +43,7 @@ local function call_sfdx_raw(command, callback)
         local nextError = next(errors)
         if exitcode > 0 then
             if nextError ~= nil and errors[nextError] ~= '' then
-                -- sfdx may return with exitcode 1 but having sent all output to stdout instead of stdout, meaning we won't have any errors. We only handle errors sent to stderr here, let the calling code deal with error messages sent to stdout
+                -- sfdx may return with exitcode 1 but having sent all output to stdout instead of stderr, meaning we won't have any errors. We only handle errors sent to stderr here, let the calling code deal with error messages sent to stdout
                 echo.err(errors)
                 return
             end

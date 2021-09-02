@@ -37,6 +37,12 @@ local function is_blank(text)
     return text == nil or trim(text) == ''
 end
 
+--[[
+Splits a string into a list at the specified separator
+@tparam text string The string we want to split
+@tparam separator string The separator to use for splitting
+@treturn table A list with each split piece of the original string
+]]
 local function split(text, separator)
     if separator == nil then separator = '%s' end
     local parts = {}
