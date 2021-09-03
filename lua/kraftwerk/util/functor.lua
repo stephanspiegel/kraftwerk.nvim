@@ -13,6 +13,14 @@ local function deepcopy(orig)
     return copy
 end
 
+function clone(tbl)
+    if tbl == nil then return {} end
+    if type(tbl) ~= "table" then
+        return {tbl}
+    end
+    return {unpack(tbl)}
+end
+
 local function contains(tbl, test_value)
     if tbl == nil then return false end
     for _, value in ipairs(tbl) do
@@ -54,7 +62,7 @@ Given two lists, create a new list by adding the second list to the end of the f
 @treturn table The result of adding list2 to the end of list1
 ]]
 local function concat(list1, list2)
-    local result = deepcopy(list1)
+    local result = clone(list1)
     if is_null_or_empty(result) then
         result = {}
     end
@@ -130,7 +138,7 @@ Iterates over a list, passing an "accumulator" and each element to the supplied 
 @tparam init any The initial value for the accumulator; if nil, use the first element of the list instead
 ]]
 local function fold(fn, list_orig, init)
-    local list = deepcopy(list_orig)
+    local list = clone(list_orig)
     if type(list) ~= "table" then
         list = {list}
     end
@@ -151,7 +159,8 @@ Add an element to the end of a list. Wraps table.insert() in order to not modify
 @tparam any element The element to add to the end of the list
 ]]
 local function append(list, element)
-    local tbl = deepcopy(list)
+    local tbl = clone(list)
+    if tbl == nil then tbl = {} end
     table.insert(tbl, element)
     return tbl
 end
@@ -180,7 +189,7 @@ Given a list and an item, put the item in between each element of the list
 @treturn table A new list with the item interspersed between each list item
 ]]
 local function intersperse(item, list)
-    local result = deepcopy(list)
+    local result = clone(list)
     if is_null_or_empty(result) then
         return {}
     end
@@ -192,7 +201,7 @@ end
 
 local function filter(predicate, list)
     local function filter_folder(acc_orig, x)
-        local acc = deepcopy(acc_orig)
+        local acc = clone(acc_orig)
         if predicate(x) then
             table.insert(acc, x)
         end
@@ -216,4 +225,5 @@ return {
     keys = keys,
     map = map,
     slice = slice,
+    clone = clone
 }
