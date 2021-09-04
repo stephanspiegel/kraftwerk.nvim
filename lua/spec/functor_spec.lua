@@ -133,29 +133,29 @@ describe("functor", function()
             assert.same({'c', 'd'}, result_table)
         end)
 
-        it("should error if negative start_index given", function()
-            local source_table = { 'a' }
-            assert.has.errors(function() functor.slice(source_table, -1) end)
+        it("should count from end of list if start index is negative", function()
+            local source_table = { 'a', 'b', 'c', 'd', 'e' }
+            assert.same({'d', 'e'}, functor.slice(source_table, -2))
         end)
 
-        it("should error if negative end_index given", function()
-            local source_table = { 'a' }
-            assert.has.errors(function() functor.slice(source_table, 1, -1) end)
+        it("should count from end of list if end index is negative", function()
+            local source_table = { 'a', 'b', 'c', 'd', 'e' }
+            assert.same({'c', 'd'}, functor.slice(source_table, 3, -2))
         end)
 
-        it("should error if start_index is less than end_index", function()
+        it("should swap start and end indexes if start index is larger than end index", function()
+            local source_table = { 'a', 'b', 'c', 'd', 'e' }
+            assert.same({'b', 'c', 'd'}, functor.slice(source_table, 4, 2))
+        end)
+
+        it("should return empty list if start_index is greater than table size", function()
             local source_table = { 'a', 'b', 'c' }
-            assert.has.errors(function() functor.slice(source_table, 2, 1) end)
+            assert.same({}, functor.slice(source_table, 4))
         end)
 
-        it("should error if start_index is greater than table size", function()
+        it("should return to end of list if end_index is greater than table size", function()
             local source_table = { 'a', 'b', 'c' }
-            assert.has.errors(function() functor.slice(source_table, 4) end)
-        end)
-
-        it("should error if end_index is greater than table size", function()
-            local source_table = { 'a', 'b', 'c' }
-            assert.has.errors(function() functor.slice(source_table, 2, 4) end)
+            assert.same({'b', 'c'}, functor.slice(source_table, 2, 11))
         end)
 
     end)
@@ -188,24 +188,24 @@ describe("functor", function()
         it('should be able to sum a list of integers', function()
             local list = { 1,2,3 }
             local sum = function(x, acc) return acc + x end
-            assert.are_equal(6, functor.fold(sum, list, 0))
+            assert.are_equal(6, functor.fold(sum, 0, list))
         end)
 
         it('should accept an init value', function()
             local list = { 1,2,3 }
             local sum = function(x, acc) return acc + x end
-            assert.are_equal(10, functor.fold(sum, list, 4))
+            assert.are_equal(10, functor.fold(sum, 4, list))
         end)
 
         it('should use first value as init if no init supplied', function()
             local list = {'a', 'b', 'c'}
             local keep_init = function(acc) return acc end
-            assert.are_equal('a', functor.fold(keep_init, list))
+            assert.are_equal('a', functor.fold(keep_init, nil, list))
         end)
 
         it('should wrap non-table input as table', function()
             local function sum(x, acc) return acc + x end
-            assert.are_equal(5, functor.fold(sum, 3, 2))
+            assert.are_equal(5, functor.fold(sum, 2, 3))
         end)
 
     end)
@@ -263,6 +263,12 @@ describe("functor", function()
         it('should return flat map from nested input', function()
             local function func(x) return {x*2} end
             assert.same({6,12}, functor.flatmap(func, {3,6}))
+        end)
+
+        it('should return curried function if no list provided', function()
+            local function func(x) return {x*2} end
+            local curried_function = functor.flatmap(func)
+            assert.same({6,12}, curried_function({3,6}))
         end)
 
     end)

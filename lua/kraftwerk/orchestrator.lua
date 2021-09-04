@@ -80,8 +80,8 @@ local function build_command_string(command_definition, completion_function_name
 end
 
 local function register_completion(command_definition)
-    if functor.is_null_or_empty(command_definition.expected_input)
-        or functor.is_null_or_empty(command_definition.expected_input.args) then
+    if functor.is_nil_or_empty(command_definition.expected_input)
+        or functor.is_nil_or_empty(command_definition.expected_input.args) then
         return ''
     end
     local module_name = command_definition.meta.module
