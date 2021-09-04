@@ -8,6 +8,7 @@ local function define_commands()
     orchestrator.register('data', 'query')
     orchestrator.register('source', 'push')
     orchestrator.register('apex', 'testrun')
+    orchestrator.register('apex', 'execute')
 end
 
 local function define_globals()

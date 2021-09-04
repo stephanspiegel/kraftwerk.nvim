@@ -3,6 +3,7 @@ local buffer = require('kraftwerk.util.buffer')
 local echo = require('kraftwerk.util.echo')
 local quickfix = require('kraftwerk.util.quickfix')
 local window_handler = require('kraftwerk.util.window_handler')
+local text = require('kraftwerk.util.text')
 
 local function message_handler(message_data)
     echo.multiline(message_data)
@@ -51,17 +52,31 @@ local function gather_args(expected_args, args)
     return args
 end
 
-local function gather_content(content, range)
-    if not functor.contains_key(content, 'source') then echo.err('"source" is a required field when "content" is specified')
+local function write_temp_file_from(content)
+    local temp_file_name = vim.fn.tempname()
+    local content_list = text.split(content, '\n')
+    vim.fn.writefile(content_list, temp_file_name)
+    return temp_file_name
+end
+
+local function gather_content(expected_content, range)
+    if not functor.contains_key(expected_content, 'source') then echo.err('"source" is a required field when "content" is specified')
     end
-    if content.source == 'range_or_current_line' then
+    local content
+    if expected_content.source == 'range_or_current_line' then
         -- TODO: handle range, line, visual selection or current line <26-08-21, stephan.spiegel> --
-        return buffer.get_visual_selection()
-    elseif content.source == 'range_or_current_file' then
-        -- TODO: handle range, line, visual selection or current line <26-08-21, stephan.spiegel> --
-        return buffer.get_visual_selection()
+        content = buffer.get_visual_selection()
+    elseif expected_content.source == 'range_or_current_file' then
+        -- TODO: handle range, line, visual selection or current file <26-08-21, stephan.spiegel> --
+        content = buffer.get_visual_selection()
     else
-        echo.err('Unknown content source: '..content.source)
+        echo.err('Unknown content source: '..expected_content.source)
+    end
+    if expected_content.format == 'temp_file' then
+        local file_name = write_temp_file_from(content)
+        return 'temp_file_path', file_name
+    else
+        return 'content', content
     end
 end
 
@@ -71,7 +86,8 @@ local function gather_input(expected_input, bang, range, args)
         input = gather_args(expected_input.args, args)
     end
     if functor.contains_key(expected_input, 'content') then
-        input['content'] = gather_content(expected_input.content, range)
+        local field, content = gather_content(expected_input.content, range)
+        input[field] = content
     end
     if functor.contains_key(expected_input, 'bang') then
         input.bang = bang

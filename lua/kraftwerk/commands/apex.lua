@@ -79,7 +79,79 @@ local testrun_command = {
     sfdx_call = 'call_sfdx'
 }
 
+local expected_execute_input = {
+    args = {
+        {
+            name = 'user',
+            required = false,
+            complete = completion.user
+        }
+    },
+    content = {
+        source = 'range_or_current_file',
+        format = 'temp_file',
+        required = true
+    }
+}
+
+local function execute_callback(result)
+    print('received result:')
+    dump(result)
+    if result.status > 0 then
+        return handle_failure(result)
+    end
+    local io_data = {
+        messages = {}
+    }
+    if result.result.success then
+        io_data.messages.info = {'Executed anonymous code successfully'}
+        local logs = text.split(result.result.logs, '\n')
+        io_data.result_buffer = {
+            title = '__Apex_Result__',
+            content = logs,
+            file_type = 'apexlog'
+        }
+    elseif result.result.compiled then
+        io_data.quickfix = quickfix.build_execute_anonymous_error_item(result.result)
+        local logs = text.split(result.result.logs, '\n')
+        io_data.result_buffer = {
+            title = '__Apex_Result__',
+            content = logs,
+            file_type = 'apexlog'
+        }
+        io_data.messages.err = {'Error executing anonymous code'}
+    else
+        io_data.quickfix = { quickfix.build_compile_error_item(result.result) }
+        io_data.messages.err = {'Error compiling anonymous code'}
+    end
+    print('returning io_data:')
+    dump(io_data)
+    return io_data
+end
+
+local function build_execute_command(input)
+    print('input:')
+    dump(input)
+    local sfdx_command_parts = {
+        'force:apex:execute'
+    }
+    sfdx_command_parts = functor.append(sfdx_command_parts, '--apexcodefile '..input.temp_file_path)
+    if functor.contains_key(input, 'user') then
+        sfdx_command_parts = functor.append(sfdx_command_parts, ' --targetusername=' .. input.user)
+    end
+    local sfdx_command = table.concat(sfdx_command_parts, ' ')
+    return sfdx_command, execute_callback
+end
+
 local execute_command = {
+    meta = {
+        module = 'apex',
+        name = 'execute',
+        command_name = 'ForceApexExecute'
+    },
+    expected_input = expected_execute_input,
+    build_command = build_execute_command,
+    sfdx_call = 'call_sfdx'
 
 }
 

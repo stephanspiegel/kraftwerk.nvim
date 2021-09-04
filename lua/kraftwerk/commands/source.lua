@@ -15,7 +15,7 @@ local function push_callback(result)
     if result.status ~= 0 then
         io_data.messages.err = { result.commandName .. ": " .. result.message }
         if functor.contains_key(result, 'result') then
-            io_data.quickfix = quickfix.build_error_items(result)
+            io_data.quickfix = quickfix.build_push_error_items(result.result)
         end
     else
         local pushedSource = result.result.pushedSource
