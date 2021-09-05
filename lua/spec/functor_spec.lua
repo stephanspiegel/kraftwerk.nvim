@@ -31,7 +31,7 @@ describe("functor", function()
 
     end)
 
-    describe("contains_key()", function()
+    describe("has_key()", function()
 
         it("should return 'true' if the table contains the key", function()
             local organisms = {
@@ -39,7 +39,7 @@ describe("functor", function()
                 plant = "Paris japonica",
                 fungus = "Gymnosporangium confusum"
             }
-            assert.is_true(functor.contains_key(organisms, "plant"))
+            assert.is_true(functor.has_key(organisms, "plant"))
         end)
 
         it("should return 'false' if the table doesn't contain the key", function()
@@ -48,7 +48,7 @@ describe("functor", function()
                 plant = "Paris japonica",
                 fungus = "Gymnosporangium confusum"
             }
-            assert.is_false(functor.contains_key(organisms, "protist"))
+            assert.is_false(functor.has_key(organisms, "protist"))
         end)
 
         it("should return 'false' if the test value is nil", function()
@@ -57,17 +57,17 @@ describe("functor", function()
                 plant = "Paris japonica",
                 fungus = "Gymnosporangium confusum"
             }
-            assert.is_false(functor.contains_key(organisms, nil))
+            assert.is_false(functor.has_key(organisms, nil))
         end)
 
         it("should return 'false' if the table is empty", function()
             local organisms = {}
-            assert.is_false(functor.contains_key(organisms, "plant"))
+            assert.is_false(functor.has_key(organisms, "plant"))
         end)
 
         it("should return 'false' if the table is nil", function()
             local organisms = nil
-            assert.is_false(functor.contains_key(organisms, "plant"))
+            assert.is_false(functor.has_key(organisms, "plant"))
         end)
 
     end)

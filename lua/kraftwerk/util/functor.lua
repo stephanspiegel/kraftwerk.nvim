@@ -54,7 +54,7 @@ Does a given (key-value) table contain a given key?
 @tparam test_key The value for which we'd like to know if it's a key of table
 @treturn boolean True if the table has the key, false otherwise
 ]]
-local function contains_key(tbl, test_key)
+local function has_key(tbl, test_key)
     if tbl == nil then return false end
     if type(tbl) ~= "table" then return false end
     for key, _ in pairs(tbl) do
@@ -66,7 +66,7 @@ local function contains_key(tbl, test_key)
 end
 
 --[[
-Does a given (key-value) table contain a given value?
+Does a given (key-value or list) table contain a given value?
 @tparam tbl table The table to investigate
 @tparam test_value any The value for which we'd like to know if it's a value of table
 @treturn boolean True if the table has the value, false otherwise
@@ -295,7 +295,7 @@ return {
     append = append,
     concat = concat,
     contains = contains,
-    contains_key = contains_key,
+    has_key = has_key,
     contains_value = contains_value,
     deepcopy = deepcopy,
     filter = filter,

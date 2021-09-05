@@ -9,7 +9,7 @@ local call = function(module_name, command, ...)
     local bang = false
     local command_module = require('kraftwerk.commands.'..module_name)[command]
     local expected_input = command_module.expected_input
-    if functor.contains_key(expected_input, 'bang') and expected_input.bang then
+    if functor.has_key(expected_input, 'bang') and expected_input.bang then
         bang = command_args[1] == '!'
         command_args = functor.slice(command_args, 2)
     end
@@ -24,10 +24,10 @@ local call = function(module_name, command, ...)
         end
     end
     local input_result = io_handler.gather_input(expected_input, bang, range, args)
-    if functor.contains_key(input_result, 'messages') then
+    if functor.has_key(input_result, 'messages') then
         local messages = input_result.messages
         io_handler.output({ messages = messages })
-        if functor.contains_key(messages, 'err') then
+        if functor.has_key(messages, 'err') then
             return
         end
     end
@@ -46,13 +46,13 @@ local function build_command_string(command_definition, completion_function_name
     local command = command_definition.meta.name
     local expected_input = command_definition.expected_input
     local args = { "'"..module_name.."'", "'"..command.."'"}
-    if functor.contains_key(expected_input, 'bang') then
+    if functor.has_key(expected_input, 'bang') then
         if expected_input.bang == true then
             table.insert(command_parts, '-bang')
             table.insert(args, '<q-bang>')
         end
     end
-    if functor.contains_key(expected_input, 'content') then
+    if functor.has_key(expected_input, 'content') then
         local content_source = expected_input.content.source
         if content_source == 'range_or_current_line' then
             table.insert(command_parts, '-range')
@@ -66,7 +66,7 @@ local function build_command_string(command_definition, completion_function_name
             table.insert(args, '<line2>')
         end
     end
-    if functor.contains_key(expected_input, 'args') then
+    if functor.has_key(expected_input, 'args') then
         table.insert(command_parts, '-nargs=*')
         if completion_function_name ~= nil then
             table.insert(command_parts, "-complete=custom,v:lua."..completion_function_name)
@@ -90,11 +90,11 @@ local function register_completion(command_definition)
     local completion_function_full_name = 'kraftwerk.command_completion.' .. completion_function_name
     local completion_functions = {}
     for _, arg in ipairs(command_definition.expected_input.args) do
-        if functor.contains_key(arg, 'valid_values') then
+        if functor.has_key(arg, 'valid_values') then
             table.insert(completion_functions, function()
                 return arg.valid_values
             end)
-        elseif functor.contains_key(arg, 'complete') then
+        elseif functor.has_key(arg, 'complete') then
             table.insert(completion_functions, arg.complete)
         else
             table.insert(completion_functions, function() return {} end)

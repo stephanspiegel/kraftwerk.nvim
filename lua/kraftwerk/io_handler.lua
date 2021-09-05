@@ -17,7 +17,7 @@ local handlers = {
 
 local function output(output_data)
     for key, value in pairs(output_data) do
-        if not functor.contains_key(handlers, key) then
+        if not functor.has_key(handlers, key) then
             echo.err('io_handler received unknown key: '..key)
             return
         end
@@ -30,15 +30,15 @@ local function gather_args(expected_args, args)
     for index, arg_definition in ipairs(expected_args) do
         local arg_value = args[index]
         if arg_value == nil then
-            if functor.contains_key(arg_definition, 'required') and arg_definition.required == true then
+            if functor.has_key(arg_definition, 'required') and arg_definition.required == true then
                 local err = 'Missing required argument: ' .. arg_definition.name
                 return { messages = { err = err }}
             end
-            if functor.contains_key(arg_definition, 'default_value') then
+            if functor.has_key(arg_definition, 'default_value') then
                 arg_value = arg_definition.default_value
             end
         else
-            if functor.contains_key(arg_definition, 'valid_values') then
+            if functor.has_key(arg_definition, 'valid_values') then
                 if not functor.contains_value(arg_definition.valid_values, arg_value) then
                     local err = '"' ..arg_value .. '" is not a valid value for ' .. arg_definition.name
                     return { messages = { err = err }}
@@ -60,7 +60,7 @@ local function write_temp_file_from(content)
 end
 
 local function gather_content(expected_content, range)
-    if not functor.contains_key(expected_content, 'source') then echo.err('"source" is a required field when "content" is specified')
+    if not functor.has_key(expected_content, 'source') then echo.err('"source" is a required field when "content" is specified')
     end
     local content
     if expected_content.source == 'range_or_current_line' then
@@ -82,14 +82,14 @@ end
 
 local function gather_input(expected_input, bang, range, args)
     local input = {}
-    if functor.contains_key(expected_input, 'args') then
+    if functor.has_key(expected_input, 'args') then
         input = gather_args(expected_input.args, args)
     end
-    if functor.contains_key(expected_input, 'content') then
+    if functor.has_key(expected_input, 'content') then
         local field, content = gather_content(expected_input.content, range)
         input[field] = content
     end
-    if functor.contains_key(expected_input, 'bang') then
+    if functor.has_key(expected_input, 'bang') then
         input.bang = bang
     end
     return input

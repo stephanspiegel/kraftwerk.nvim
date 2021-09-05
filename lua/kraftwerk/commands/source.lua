@@ -14,7 +14,7 @@ local function push_callback(result)
     local io_data = { messages = {} }
     if result.status ~= 0 then
         io_data.messages.err = { result.commandName .. ": " .. result.message }
-        if functor.contains_key(result, 'result') then
+        if functor.has_key(result, 'result') then
             io_data.quickfix = quickfix.build_push_error_items(result.result)
         end
     else
@@ -40,7 +40,7 @@ Call sfdx force:source:push.
 local function build_push_command(input)
     local user_clause = ''
     local force_clause = ''
-    if functor.contains_key(input, 'user') then
+    if functor.has_key(input, 'user') then
         user_clause = ' --targetusername=' .. input.user
     end
     if input.bang then

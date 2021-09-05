@@ -20,17 +20,17 @@ local function build_query_command(input)
     sfdx_command = sfdx_command .. ' --query "' .. query_string .. '"'
     local result_config = result_configs[format]
     local result_format = format
-    if functor.contains_key(result_config, "format") then
+    if functor.has_key(result_config, "format") then
         result_format = result_config.format
     end
     local file_type = result_config.filetype
     local processor
-    if functor.contains_key(result_config, "processor") then
+    if functor.has_key(result_config, "processor") then
         processor = result_config.processor
     end
     local result_format_clause = "  --resultformat=" .. result_format
     local user_clause = ''
-    if functor.contains_key(input, 'user') then
+    if functor.has_key(input, 'user') then
         user_clause = ' --targetusername=' .. input.user
     end
     sfdx_command = sfdx_command .. result_format_clause .. user_clause
