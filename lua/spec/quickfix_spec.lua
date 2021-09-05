@@ -89,12 +89,12 @@ describe('quickfix', function()
             local expected = {
                 {
                     col = "1",
-                    filename = "force-app/main/default/classes/Entity.cls",
+                    filename = "",
                     lnum = "20",
                     module = "Class.Entity.move",
                     text = "System.NullPointerException: Attempt to de-reference a null object"
                 }, {
-                    bufnr = 76,
+                    bufnr = 1,
                     col = "1",
                     lnum = "2",
                     module = "AnonymousBlock",
@@ -102,6 +102,50 @@ describe('quickfix', function()
                 }
             }
             assert.same(expected, quickfix.build_execute_anonymous_error_item(input))
+        end)
+
+    end)
+
+    describe('parse_stack_trace_line', function()
+
+        it('should parse "Trigger" line', function()
+            local line = 'Trigger.WorldState: line 12, column 1: error here'
+            local expected = {
+                module_name = 'Trigger.WorldState',
+                class_name = 'WorldState',
+                lnum = '12',
+                col = '1'
+            }
+            assert.same(expected, quickfix.parse_stack_trace_line(line))
+
+        end)
+
+        it('should parse "Class" line', function()
+            local line = 'Class.World_StateTriggerHandler: line 6, column 1'
+            local expected = {
+                module_name = 'Class.World_StateTriggerHandler',
+                class_name = 'World_StateTriggerHandler',
+                lnum = '6',
+                col = '1'
+            }
+            assert.same(expected, quickfix.parse_stack_trace_line(line))
+        end)
+
+        it('should parse "AnonymousBlock" line', function()
+            local line = 'AnonymousBlock: line 2, column 1: bloo'
+            local expected = {
+                module_name = 'AnonymousBlock',
+                class_name = '',
+                lnum = '2',
+                col = '1'
+            }
+            assert.same(expected, quickfix.parse_stack_trace_line(line))
+        end)
+
+        it('should not match irrelevant line', function()
+            local line = "This line won't match anything"
+            local expected = {}
+            assert.same(expected, quickfix.parse_stack_trace_line(line))
         end)
 
     end)
