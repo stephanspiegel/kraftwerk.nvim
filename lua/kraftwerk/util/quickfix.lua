@@ -25,19 +25,16 @@ local function parse_stack_trace_line(stack_trace_line)
         '(AnonymousBlock)(%.?): line (%d+), column (%d+).*',
         '(Trigger%.([^:]*)): line (%d+), column (%d+).*'
     }
-    local function match_line(line)
-        return
-            function(acc, pattern)
-                local matches = { string.match(line, pattern) }
-                if functor.is_nil_or_empty(matches) then
-                    return acc
-                end
-                return matches
-            end
+    local function match_line(acc, pattern)
+        local matches = { string.match(stack_trace_line, pattern) }
+        if functor.is_nil_or_empty(matches) then
+            return acc
+        end
+        return matches
     end
-    local pattern_matches = functor.fold(match_line(stack_trace_line), {}, patterns)
+    local pattern_matches = functor.fold(match_line, {}, patterns)
     return {
-        module_name = pattern_matches[1],
+        module = pattern_matches[1],
         class_name = pattern_matches[2],
         lnum = pattern_matches[3],
         col = pattern_matches[4]
@@ -72,62 +69,30 @@ local function build_push_error_item(result)
     return error_item
 end
 
+local function build_error_item_from_stacktrace_line(line)
+    local error_item = parse_stack_trace_line(line)
+    if text.is_blank(error_item.class_name) then
+        error_item.bufnr = vim.fn.bufnr('%')
+    else
+        error_item.filename = vim.fn.findfile(error_item.class_name .. '.cls', '**')
+    end
+    error_item.class_name = nil
+    error_item.text = '... Continued'
+    return error_item
+end
+
 local function build_execute_anonymous_error_item(result)
     local stack_trace_lines = text.split(result.exceptionStackTrace, '\n')
-    local stack_trace_pattern = '(Class%.([^.]*)[^:]*): line (%d+), column (%d+)'
-    local error_text = ''
-    local error_items = {}
-    for _, line in ipairs(stack_trace_lines) do
-        local module_text, class_name, line_number, column_number = line:match(stack_trace_pattern)
-        local file_name, buffer_number
-        if class_name ~= nil then
-            file_name = vim.fn.findfile(class_name .. '.cls', '**')
-        else
-            module_text, line_number, column_number = line:match('(AnonymousBlock): line (%d+), column (%d+)')
-            buffer_number = vim.fn.bufnr('%')
-        end
-        if text.is_blank(error_text) then
-            error_text = result.exceptionMessage
-        else
-            error_text = '... Continued'
-        end
-        local error_item = {
-            lnum = line_number,
-            col = column_number,
-            text = error_text,
-            module = module_text
-        }
-        if file_name ~= nil then
-            error_item.filename = file_name
-        elseif buffer_number ~= nil then
-            error_item.bufnr = buffer_number
-        end
-        error_items = functor.append(error_items, error_item)
-    end
+    local error_items = functor.map(build_error_item_from_stacktrace_line, stack_trace_lines)
+    error_items[1].text = result.exceptionMessage
     return error_items
 end
 
 local function build_test_error_item(failed_test)
     local stack_trace_lines = text.split(failed_test.StackTrace, '\n')
-    local stack_trace_pattern = '(Class%.([^.]*)[^:]*): line (%d+), column (%d+)'
-    local error_text = ''
-    local function build_error_item_from_stacktrace_line(line)
-        local module_text, class_name, line_number, column_number = line:match(stack_trace_pattern)
-        local file_name = vim.fn.findfile(class_name .. '.cls', '**')
-        if text.is_blank(error_text) then
-            error_text = failed_test.Message
-        else
-            error_text = '... Continued'
-        end
-        return {
-            lnum = line_number,
-            col = column_number,
-            filename = file_name,
-            text = error_text,
-            module = module_text
-        }
-    end
-    return functor.map(build_error_item_from_stacktrace_line, stack_trace_lines)
+    local error_items = functor.map(build_error_item_from_stacktrace_line, stack_trace_lines)
+    error_items[1].text = failed_test.Message
+    return error_items
 end
 
 local function build_push_error_items(results)

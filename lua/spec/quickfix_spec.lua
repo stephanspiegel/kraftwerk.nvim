@@ -111,7 +111,7 @@ describe('quickfix', function()
         it('should parse "Trigger" line', function()
             local line = 'Trigger.WorldState: line 12, column 1: error here'
             local expected = {
-                module_name = 'Trigger.WorldState',
+                module = 'Trigger.WorldState',
                 class_name = 'WorldState',
                 lnum = '12',
                 col = '1'
@@ -123,7 +123,7 @@ describe('quickfix', function()
         it('should parse "Class" line', function()
             local line = 'Class.World_StateTriggerHandler: line 6, column 1'
             local expected = {
-                module_name = 'Class.World_StateTriggerHandler',
+                module = 'Class.World_StateTriggerHandler',
                 class_name = 'World_StateTriggerHandler',
                 lnum = '6',
                 col = '1'
@@ -134,7 +134,7 @@ describe('quickfix', function()
         it('should parse "AnonymousBlock" line', function()
             local line = 'AnonymousBlock: line 2, column 1: bloo'
             local expected = {
-                module_name = 'AnonymousBlock',
+                module = 'AnonymousBlock',
                 class_name = '',
                 lnum = '2',
                 col = '1'
