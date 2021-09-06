@@ -95,8 +95,6 @@ local expected_execute_input = {
 }
 
 local function execute_callback(result)
-    print('received result:')
-    dump(result)
     if result.status > 0 then
         return handle_failure(result)
     end
@@ -112,7 +110,7 @@ local function execute_callback(result)
             file_type = 'apexlog'
         }
     elseif result.result.compiled then
-        io_data.quickfix = quickfix.build_execute_anonymous_error_item(result.result)
+        io_data.quickfix = quickfix.build_execute_anonymous_error_items(result.result)
         local logs = text.split(result.result.logs, '\n')
         io_data.result_buffer = {
             title = '__Apex_Result__',
@@ -121,17 +119,13 @@ local function execute_callback(result)
         }
         io_data.messages.err = {'Error executing anonymous code'}
     else
-        io_data.quickfix = { quickfix.build_compile_error_item(result.result) }
+        io_data.quickfix = quickfix.build_compile_error_items(result.result)
         io_data.messages.err = {'Error compiling anonymous code'}
     end
-    print('returning io_data:')
-    dump(io_data)
     return io_data
 end
 
 local function build_execute_command(input)
-    print('input:')
-    dump(input)
     local sfdx_command_parts = {
         'force:apex:execute'
     }

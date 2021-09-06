@@ -19,6 +19,12 @@ local sfdx_type_to_vim_type = {
     Warning = 'W'
 }
 
+--[[--
+Parse a stack trace line in a way that can be used to build quickfix errors.
+Pure function
+@tparam stack_trace_line string The line from a stack trace we'd like to parse
+@treturn table A table with components useful for building error items
+]]
 local function parse_stack_trace_line(stack_trace_line)
     local patterns = {
         '(Class%.([^.]*)[^:]*): line (%d+), column (%d+).*',
@@ -41,8 +47,15 @@ local function parse_stack_trace_line(stack_trace_line)
     }
 end
 
-local function build_compile_error_item(sfdx_result)
-    local selection_line, selection_column, _, _ = buffer.get_visual_selection_range()
+--[[--
+Build a list oferror items from a compile error resulting from "force:apex:execute".
+Will always only contain a single item
+Not pure: calls buffer.get_visual_selection_range()
+@tparam sfdx_result table The "result" field in the response returned by sfdx
+@return table An list of error items ready to pass to quickfix with a single element
+]]
+local function build_compile_error_items(sfdx_result)
+    local selection_line, selection_column, _, _ = buffer.get_visual_selection_range() -- action
     local line = selection_line + sfdx_result.line -1
     local column = selection_column + sfdx_result.column -1
     local error_item = {
@@ -53,9 +66,15 @@ local function build_compile_error_item(sfdx_result)
         module = 'AnonymousBlock',
         problemType = 'E'
     }
-    return error_item
+    return { error_item }
 end
 
+--[[--
+Build an error item from a "force:source:push" error.
+Pure function
+@tparam result table  The "result" field in the response returned by sfdx
+@tresult table A list of error items ready to pass to quickfix
+]]
 local function build_push_error_item(result)
     local function error_item_builder(acc, sfdx_error_field)
         if functor.has_key(result, sfdx_error_field) then
@@ -70,40 +89,70 @@ local function build_push_error_item(result)
     return functor.fold(error_item_builder, {}, functor.keys(sfdx_error_to_vim_error))
 end
 
+--[[--
+Build an error item from a stack trace line.
+Not pure: Calls either vim.fn.bufnr() or vim.fn.findfile()
+@tparam line string The stack trace line we want to build an error item from
+@treturn table An error item ready to pass to quickfix
+]]
 local function build_error_item_from_stacktrace_line(line)
-    local error_item = parse_stack_trace_line(line)
+    local error_item = functor.clone(parse_stack_trace_line(line))
     if text.is_blank(error_item.class_name) then
-        error_item.bufnr = vim.fn.bufnr('%')
+        error_item.bufnr = vim.fn.bufnr('%') -- action
     else
-        error_item.filename = vim.fn.findfile(error_item.class_name .. '.cls', '**')
+        error_item.filename = vim.fn.findfile(error_item.class_name .. '.cls', '**') -- action
     end
     error_item.class_name = nil
     error_item.text = '... Continued'
     return error_item
 end
 
-local function build_execute_anonymous_error_item(result)
+--[[--
+Build a list of error items from a failure result (non-compile issue) of "force:apex:execute".
+Not pure: calls build_error_item_from_stacktrace_line()
+@tparam result table  The "result" field in the response returned by sfdx
+@treturn table A list of error items ready to pass to quickfix
+]]
+local function build_execute_anonymous_error_items(result)
     local stack_trace_lines = text.split(result.exceptionStackTrace, '\n')
-    local error_items = functor.map(build_error_item_from_stacktrace_line, stack_trace_lines)
+    local error_items = functor.map(build_error_item_from_stacktrace_line, stack_trace_lines) --action
     error_items[1].text = result.exceptionMessage
     return error_items
 end
 
+--[[--
+Build a list of error items from a single unit test failure returned by "force:apex:test:run".
+Not pure: calls build_error_item_from_stacktrace_line()
+@tparam result table  The "result" field in the response returned by sfdx
+@treturn table A list of error items ready to pass to quickfix
+]]
 local function build_test_error_item(failed_test)
     local stack_trace_lines = text.split(failed_test.StackTrace, '\n')
-    local error_items = functor.map(build_error_item_from_stacktrace_line, stack_trace_lines)
+    local error_items = functor.map(build_error_item_from_stacktrace_line, stack_trace_lines) --action
     error_items[1].text = failed_test.Message
     return error_items
 end
 
+--[[--
+Build a list of error items from a "force:source:push" failure.
+Pure function
+@tparam result table  The "result" field in the response returned by sfdx
+@treturn table A list of error items ready to pass to quickfix
+]]
 local function build_push_error_items(results)
     local quick_fix_errors = functor.map(build_push_error_item, results)
     return quick_fix_errors
 end
 
+--[[--
+Build a list of error items from a unit test failure returned by "force:apex:test:run".
+Not pure: calls build_test_error_item()
+@tparam result table  The "result" field in the response returned by sfdx
+@treturn table A list of error items ready to pass to quickfix
+]]
 local function build_test_error_items(result)
     local failed_tests = functor.filter(function(x) return x.Outcome == 'Fail' end, result.tests)
-    local quick_fix_errors = functor.flatmap(build_test_error_item, failed_tests)
+    local quick_fix_errors = functor.flatmap(build_test_error_item, failed_tests) -- action
     return quick_fix_errors
 end
 
@@ -134,12 +183,12 @@ local function show_errors(quickfix_items)
 end
 
 return {
-    build_compile_error_item = build_compile_error_item,
-    build_execute_anonymous_error_item = build_execute_anonymous_error_item,
+    build_compile_error_items = build_compile_error_items,
+    build_execute_anonymous_error_items = build_execute_anonymous_error_items,
     build_push_error_items = build_push_error_items,
     build_test_error_items = build_test_error_items,
     close = close,
     open = open,
+    parse_stack_trace_line = parse_stack_trace_line, -- Does this need to be exported?
     show_errors = show_errors,
-    parse_stack_trace_line = parse_stack_trace_line
 }
