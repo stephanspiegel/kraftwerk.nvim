@@ -57,16 +57,17 @@ local function build_compile_error_item(sfdx_result)
 end
 
 local function build_push_error_item(result)
-    local error_item = {}
-    for sfdx_field, vim_field in pairs(sfdx_error_to_vim_error) do
-        if functor.has_key(result, sfdx_field) then
-            error_item[vim_field] = result[sfdx_field]
-            if sfdx_field == 'problemType' then
-                error_item[vim_field] = sfdx_type_to_vim_type[result[sfdx_field]]
+    local function error_item_builder(acc, sfdx_error_field)
+        if functor.has_key(result, sfdx_error_field) then
+            local vim_field = sfdx_error_to_vim_error[sfdx_error_field]
+            acc[vim_field] = result[sfdx_error_field]
+            if sfdx_error_field == 'problemType' then
+                acc[vim_field] = sfdx_type_to_vim_type[result[sfdx_error_field]]
             end
         end
+        return acc
     end
-    return error_item
+    return functor.fold(error_item_builder, {}, functor.keys(sfdx_error_to_vim_error))
 end
 
 local function build_error_item_from_stacktrace_line(line)
