@@ -107,17 +107,21 @@ local function build_error_item_from_stacktrace_line(line)
     return error_item
 end
 
+local function build_error_items_from_stacktrace_lines(lines, message)
+    local split_lines = text.split(lines, '\n')
+    local error_items = functor.map(build_error_item_from_stacktrace_line, split_lines) --action
+    error_items[1].text = message
+    return error_items
+end
+
 --[[--
 Build a list of error items from a failure result (non-compile issue) of "force:apex:execute".
-Not pure: calls build_error_item_from_stacktrace_line()
+Not pure: calls build_error_items_from_stacktrace_lines()
 @tparam result table  The "result" field in the response returned by sfdx
 @treturn table A list of error items ready to pass to quickfix
 ]]
 local function build_execute_anonymous_error_items(result)
-    local stack_trace_lines = text.split(result.exceptionStackTrace, '\n')
-    local error_items = functor.map(build_error_item_from_stacktrace_line, stack_trace_lines) --action
-    error_items[1].text = result.exceptionMessage
-    return error_items
+    return build_error_items_from_stacktrace_lines(result.exceptionStackTrace, result.exceptionMessage) --action
 end
 
 --[[--
@@ -127,10 +131,7 @@ Not pure: calls build_error_item_from_stacktrace_line()
 @treturn table A list of error items ready to pass to quickfix
 ]]
 local function build_test_error_item(failed_test)
-    local stack_trace_lines = text.split(failed_test.StackTrace, '\n')
-    local error_items = functor.map(build_error_item_from_stacktrace_line, stack_trace_lines) --action
-    error_items[1].text = failed_test.Message
-    return error_items
+    return build_error_items_from_stacktrace_lines(failed_test.StackTrace, failed_test.Message) --action
 end
 
 --[[--
