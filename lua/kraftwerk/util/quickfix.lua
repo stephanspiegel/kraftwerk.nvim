@@ -121,17 +121,8 @@ Not pure: calls build_error_items_from_stacktrace_lines()
 @treturn table A list of error items ready to pass to quickfix
 ]]
 local function build_execute_anonymous_error_items(result)
-    return build_error_items_from_stacktrace_lines(result.exceptionStackTrace, result.exceptionMessage) --action
-end
-
---[[--
-Build a list of error items from a single unit test failure returned by "force:apex:test:run".
-Not pure: calls build_error_item_from_stacktrace_line()
-@tparam result table  The "result" field in the response returned by sfdx
-@treturn table A list of error items ready to pass to quickfix
-]]
-local function build_test_error_item(failed_test)
-    return build_error_items_from_stacktrace_lines(failed_test.StackTrace, failed_test.Message) --action
+    local stacktrace_data = { lines = result.exceptionStackTrace, message = result.exceptionMessage }
+    return build_error_items_from_stacktrace_lines(stacktrace_data) --action
 end
 
 --[[--
@@ -141,8 +132,7 @@ Pure function
 @treturn table A list of error items ready to pass to quickfix
 ]]
 local function build_push_error_items(results)
-    local quick_fix_errors = functor.map(build_push_error_item, results)
-    return quick_fix_errors
+    return functor.map(build_push_error_item, results)
 end
 
 --[[--
@@ -153,7 +143,11 @@ Not pure: calls build_test_error_item()
 ]]
 local function build_test_error_items(result)
     local failed_tests = functor.filter(function(x) return x.Outcome == 'Fail' end, result.tests)
-    local quick_fix_errors = functor.flatmap(build_test_error_item, failed_tests) -- action
+    local function build_stacktrace_item(failed_test)
+        return { failed_test.StackTrace, failed_test.Message }
+    end
+    local stacktrace_items = functor.map(build_stacktrace_item, failed_tests)
+    local quick_fix_errors = functor.flatmap(build_error_items_from_stacktrace_lines, stacktrace_items) -- action
     return quick_fix_errors
 end
 
