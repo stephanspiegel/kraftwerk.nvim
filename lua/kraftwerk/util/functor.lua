@@ -23,12 +23,16 @@ Make a shallow copy of a table or primitive value
 @tparam tbl any The table or primitive value to copy
 @treturn any A shallow copy of the table or primitive value; if table, the child elements are passed by reference
 ]]
-local function clone(tbl)
-    if tbl == nil then return {} end
-    if type(tbl) ~= "table" then
-        return tbl
+local function clone(data)
+    if type(data) == 'table' then
+        local copy = {}
+        for orig_key, orig_value in next, data, nil do
+            copy[orig_key] = orig_value
+        end
+        return copy
+    else -- number, string, boolean, etc
+        return data
     end
-    return {unpack(tbl)}
 end
 
 --[[

@@ -47,7 +47,7 @@ describe('quickfix', function()
 
     end)
 
-    describe('build_compile_error_item', function()
+    describe('build_compile_error_items', function()
 
         it('should return expected error item', function()
             local input = {
@@ -61,19 +61,21 @@ describe('quickfix', function()
                 success = false
             }
             local expected = {
-                bufnr = 1,
-                col = 7,
-                lnum = 0,
-                module = "AnonymousBlock",
-                problemType = "E",
-                text = "Unexpected token 'ent'."
+                {
+                    bufnr = 1,
+                    col = 7,
+                    lnum = 0,
+                    module = "AnonymousBlock",
+                    problemType = "E",
+                    text = "Unexpected token 'ent'."
+                }
             }
-            assert.same(expected, quickfix.build_compile_error_item(input))
+            assert.same(expected, quickfix.build_compile_error_items(input))
         end)
 
     end)
 
-    describe('build_execute_anonymous_error_item', function()
+    describe('build_execute_anonymous_error_items', function()
 
         it('should return expected error items', function()
             local input = {
@@ -101,7 +103,7 @@ describe('quickfix', function()
                     text = "... Continued"
                 }
             }
-            assert.same(expected, quickfix.build_execute_anonymous_error_item(input))
+            assert.same(expected, quickfix.build_execute_anonymous_error_items(input))
         end)
 
     end)

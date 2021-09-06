@@ -285,6 +285,9 @@ describe("functor", function()
             assert.same({5,7,9}, functor.append({5,7}, 9))
         end)
 
+    end)
+
+
     describe('concat()', function()
 
         it('should return empty list for two nil inputs', function()
@@ -309,6 +312,34 @@ describe("functor", function()
 
     end)
 
+    describe('clone()', function()
+
+        it('should return empty list for empty list', function()
+            assert.same({}, functor.clone({}))
+        end)
+
+        it('should return nil for nil', function()
+            assert.same(nil, functor.clone())
+        end)
+
+        it('should return same list', function()
+            assert.same({1,2,3,4}, functor.clone({1,2,3,4}))
+        end)
+
+        it('should return copy of original', function()
+            local orig = {1,2,3,4}
+            local copied = functor.clone(orig)
+            orig[5] = 5
+            assert.same({1,2,3,4}, copied)
+        end)
+
+        it('should return same object', function()
+            local orig = {
+                name = 'John',
+                occupation = 'Welder'
+            }
+            assert.same(orig, functor.clone(orig))
+        end)
 
     end)
 
