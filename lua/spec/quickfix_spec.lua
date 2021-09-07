@@ -62,9 +62,9 @@ describe('quickfix', function()
             }
             local expected = {
                 {
-                    bufnr = 1,
-                    col = 7,
-                    lnum = 0,
+                    bufnr = '${current_buffer_number}',
+                    col = '${selection_start_col_plus:7}',
+                    lnum = '${selection_start_line_plus:0}',
                     module = "AnonymousBlock",
                     problemType = "E",
                     text = "Unexpected token 'ent'."
@@ -91,63 +91,19 @@ describe('quickfix', function()
             local expected = {
                 {
                     col = "1",
-                    filename = "",
+                    filename = '${file_path_to:Entity.cls}',
                     lnum = "20",
                     module = "Class.Entity.move",
                     text = "System.NullPointerException: Attempt to de-reference a null object"
                 }, {
-                    bufnr = 1,
+                    bufnr = '${current_buffer_number}',
                     col = "1",
                     lnum = "2",
                     module = "AnonymousBlock",
-                    text = "... Continued"
+                    text = "    ... Continued"
                 }
             }
             assert.same(expected, quickfix.build_execute_anonymous_error_items(input))
-        end)
-
-    end)
-
-    describe('parse_stack_trace_line', function()
-
-        it('should parse "Trigger" line', function()
-            local line = 'Trigger.WorldState: line 12, column 1: error here'
-            local expected = {
-                module = 'Trigger.WorldState',
-                class_name = 'WorldState',
-                lnum = '12',
-                col = '1'
-            }
-            assert.same(expected, quickfix.parse_stack_trace_line(line))
-
-        end)
-
-        it('should parse "Class" line', function()
-            local line = 'Class.World_StateTriggerHandler: line 6, column 1'
-            local expected = {
-                module = 'Class.World_StateTriggerHandler',
-                class_name = 'World_StateTriggerHandler',
-                lnum = '6',
-                col = '1'
-            }
-            assert.same(expected, quickfix.parse_stack_trace_line(line))
-        end)
-
-        it('should parse "AnonymousBlock" line', function()
-            local line = 'AnonymousBlock: line 2, column 1: bloo'
-            local expected = {
-                module = 'AnonymousBlock',
-                class_name = '',
-                lnum = '2',
-                col = '1'
-            }
-            assert.same(expected, quickfix.parse_stack_trace_line(line))
-        end)
-
-        it('should not match irrelevant line', function()
-            local line = "This line won't match anything"
-            local expected = {}
-            assert.same(expected, quickfix.parse_stack_trace_line(line))
         end)
 
     end)

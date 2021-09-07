@@ -1,7 +1,6 @@
 local functor = require('kraftwerk.util.functor')
 local buffer = require('kraftwerk.util.buffer')
 local echo = require('kraftwerk.util.echo')
-local quickfix = require('kraftwerk.util.quickfix')
 local window_handler = require('kraftwerk.util.window_handler')
 local text = require('kraftwerk.util.text')
 
@@ -9,9 +8,83 @@ local function message_handler(message_data)
     echo.multiline(message_data)
 end
 
+local function offset_line_number_from_selection(line_offset)
+    local selection_start_line, _, _, _ = buffer.get_visual_selection_range()
+    return selection_start_line + line_offset
+end
+
+local function offset_column_number_from_selection(column_offset)
+    local _, selection_start_column, _, _ = buffer.get_visual_selection_range()
+    return selection_start_column + column_offset
+end
+
+local function find_file(file_name)
+    return vim.fn.findfile(file_name, '**')
+end
+
+local interpolators = {
+    ['selection_start_line_plus:%s*(%d+)'] = offset_line_number_from_selection,
+    ['selection_start_col_plus:%s*(%d+)'] = offset_column_number_from_selection,
+    ['file_path_to:%s*(.*)'] = find_file,
+    current_buffer_number = function() return vim.fn.bufnr('%') end,
+}
+
+local function interpolate(source_string)
+    if not text.starts_with('${', source_string) then
+        return source_string
+    end
+    local interpolation_key = string.match(source_string, '${([^}]*)}')
+    local function interpolate_keys(acc, pattern)
+        local data = string.match(interpolation_key, pattern)
+        if data ~= nil then
+            acc = interpolators[pattern](data)
+        end
+        return acc
+    end
+    return functor.fold(interpolate_keys, {}, functor.keys(interpolators))
+end
+
+--[[
+Open the quickfix window.
+--]]
+local function quickfix_open()
+    vim.cmd('copen')
+end
+
+--[[
+Close the quickfix window.
+--]]
+local function quickfix_close()
+    vim.cmd('cclose')
+end
+
+--[[
+Parse errors from what sfdx returned, and display them in the quickfix window.
+@tparam sfdx_result table The result received from sfdx as a table
+--]]
+local function show_quickfix(quickfix_items)
+    if next(quickfix_items) == nil then
+        return
+    end
+    vim.call('setqflist', quickfix_items) -- action
+    quickfix_open()
+end
+
+local function quickfix_handler(quickfix_items)
+    local function perform_string_interpolation(quickfix_item)
+        local new_item = {}
+        for key, value in pairs(quickfix_item) do
+            new_item[key] = interpolate(value)
+        end
+        return new_item
+    end
+    local processed_items = functor.map(perform_string_interpolation, quickfix_items)
+    show_quickfix(processed_items)
+end
+
 local handlers = {
     messages = message_handler,
-    quickfix = quickfix.show_errors,
+    quickfix = quickfix_handler,
     result_buffer = window_handler.open_result_buffer
 }
 

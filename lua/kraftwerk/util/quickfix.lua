@@ -50,19 +50,18 @@ end
 --[[--
 Build a list oferror items from a compile error resulting from "force:apex:execute".
 Will always only contain a single item
-Not pure: calls buffer.get_visual_selection_range()
+Pure function
 @tparam sfdx_result table The "result" field in the response returned by sfdx
 @return table An list of error items ready to pass to quickfix with a single element
 ]]
 local function build_compile_error_items(sfdx_result)
-    local selection_line, selection_column, _, _ = buffer.get_visual_selection_range() -- action
-    local line = selection_line + sfdx_result.line -1
-    local column = selection_column + sfdx_result.column -1
+    local line = '${selection_start_line_plus:' .. sfdx_result.line - 1 .. '}'
+    local column = '${selection_start_col_plus:' .. sfdx_result.column - 1 .. '}'
     local error_item = {
         lnum = line,
         col = column,
         text = sfdx_result.compileProblem,
-        bufnr = vim.fn.bufnr('%'),
+        bufnr = '${current_buffer_number}',
         module = 'AnonymousBlock',
         problemType = 'E'
     }
@@ -91,32 +90,43 @@ end
 
 --[[--
 Build an error item from a stack trace line.
-Not pure: Calls either vim.fn.bufnr() or vim.fn.findfile()
+Pure function
 @tparam line string The stack trace line we want to build an error item from
 @treturn table An error item ready to pass to quickfix
 ]]
 local function build_error_item_from_stacktrace_line(line)
     local error_item = functor.clone(parse_stack_trace_line(line))
     if text.is_blank(error_item.class_name) then
-        error_item.bufnr = vim.fn.bufnr('%') -- action
+        error_item.bufnr = '${current_buffer_number}'
     else
-        error_item.filename = vim.fn.findfile(error_item.class_name .. '.cls', '**') -- action
+        local file_extension = '.cls'
+        if text.starts_with('Trigger', error_item.module) then
+            file_extension = '.trigger'
+        end
+        local file_name = error_item.class_name .. file_extension
+        error_item.filename = '${file_path_to:'.. file_name ..'}'
     end
     error_item.class_name = nil
-    error_item.text = '... Continued'
+    error_item.text = '    ... Continued'
     return error_item
 end
 
-local function build_error_items_from_stacktrace_lines(lines, message)
-    local split_lines = text.split(lines, '\n')
+--[[--
+Given a string containing one or more stacktrace lines, build error items for quickfix.
+Pure function
+@tparam stacktrace_data string New-line separated stacktrace lines
+@treturn table A list of error items ready for quickfix
+]]
+local function build_error_items_from_stacktrace_lines(stacktrace_data)
+    local split_lines = text.split(stacktrace_data.lines, '\n')
     local error_items = functor.map(build_error_item_from_stacktrace_line, split_lines) --action
-    error_items[1].text = message
+    error_items[1].text = stacktrace_data.message
     return error_items
 end
 
 --[[--
 Build a list of error items from a failure result (non-compile issue) of "force:apex:execute".
-Not pure: calls build_error_items_from_stacktrace_lines()
+Pure function
 @tparam result table  The "result" field in the response returned by sfdx
 @treturn table A list of error items ready to pass to quickfix
 ]]
@@ -128,7 +138,7 @@ end
 --[[--
 Build a list of error items from a "force:source:push" failure.
 Pure function
-@tparam result table  The "result" field in the response returned by sfdx
+@tparam results table  The "result" field in the response returned by sfdx
 @treturn table A list of error items ready to pass to quickfix
 ]]
 local function build_push_error_items(results)
@@ -137,44 +147,18 @@ end
 
 --[[--
 Build a list of error items from a unit test failure returned by "force:apex:test:run".
-Not pure: calls build_test_error_item()
+Pure function
 @tparam result table  The "result" field in the response returned by sfdx
 @treturn table A list of error items ready to pass to quickfix
 ]]
 local function build_test_error_items(result)
     local failed_tests = functor.filter(function(x) return x.Outcome == 'Fail' end, result.tests)
     local function build_stacktrace_item(failed_test)
-        return { failed_test.StackTrace, failed_test.Message }
+        return { lines = failed_test.StackTrace, message = failed_test.Message }
     end
     local stacktrace_items = functor.map(build_stacktrace_item, failed_tests)
     local quick_fix_errors = functor.flatmap(build_error_items_from_stacktrace_lines, stacktrace_items) -- action
     return quick_fix_errors
-end
-
---[[
-Open the quickfix window.
---]]
-local function open()
-    vim.cmd('copen')
-end
-
---[[
-Close the quickfix window.
---]]
-local function close()
-    vim.cmd('cclose')
-end
-
---[[
-Parse errors from what sfdx returned, and display them in the quickfix window.
-@tparam sfdx_result table The result received from sfdx as a table
---]]
-local function show_errors(quickfix_items)
-    if next(quickfix_items) == nil then
-        return
-    end
-    vim.call('setqflist', quickfix_items)
-    open()
 end
 
 return {
@@ -182,8 +166,4 @@ return {
     build_execute_anonymous_error_items = build_execute_anonymous_error_items,
     build_push_error_items = build_push_error_items,
     build_test_error_items = build_test_error_items,
-    close = close,
-    open = open,
-    parse_stack_trace_line = parse_stack_trace_line, -- Does this need to be exported?
-    show_errors = show_errors,
 }
