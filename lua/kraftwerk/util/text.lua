@@ -44,6 +44,7 @@ Splits a string into a list at the specified separator
 @treturn table A list with each split piece of the original string
 ]]
 local function split(text, separator)
+    if is_blank(text) then return {} end
     if separator == nil then separator = '%s' end
     local parts = {}
     for str in text:gmatch("([^"..separator.."]+)") do

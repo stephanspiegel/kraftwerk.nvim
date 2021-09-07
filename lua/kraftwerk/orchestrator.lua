@@ -104,9 +104,13 @@ local function register_completion(command_definition)
     _G.kraftwerk.command_completion[completion_function_name] = function(arg_lead, cmd_line, cursor_pos)
         -- find which argument the cursor is on
         local cmd_line_to_cursor = string.sub(cmd_line, 1, cursor_pos)
-        local cmd_line_words = text.split(cmd_line_to_cursor)
+        local cmd_line_words = text.split(cmd_line_to_cursor, '%S+')
         local argument_pos = #cmd_line_words
-        local candidates = completion_functions[argument_pos](arg_lead, cmd_line, cursor_pos)
+        local current_arg_completion = completion_functions[argument_pos]
+        if current_arg_completion == nil then
+            return ''
+        end
+        local candidates = current_arg_completion(arg_lead, cmd_line, cursor_pos)
         return table.concat(candidates, '\n')
     end
     return completion_function_full_name
