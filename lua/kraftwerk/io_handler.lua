@@ -99,10 +99,15 @@ local function output(output_data)
 end
 
 local function gather_args(expected_args, args)
+    print('args:')
+    dump(args)
     if args == nil then args = {} end
+    local processed_args = {}
     for index, arg_definition in ipairs(expected_args) do
         local arg_value = args[index]
-        if arg_value == nil then
+        print('arg_value')
+        dump(arg_value)
+        if text.is_blank(arg_value) then
             if functor.has_key(arg_definition, 'required') and arg_definition.required == true then
                 local err = 'Missing required argument: ' .. arg_definition.name
                 return { messages = { err = err }}
@@ -118,11 +123,11 @@ local function gather_args(expected_args, args)
                 end
             end
         end
-        if arg_value ~= nil then
-            args[arg_definition.name] = arg_value
+        if not text.is_blank(arg_value) then
+            processed_args[arg_definition.name] = arg_value
         end
     end
-    return args
+    return processed_args
 end
 
 local function write_temp_file_from(content)
