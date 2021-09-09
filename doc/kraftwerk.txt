@@ -1,0 +1,110 @@
+*kraftwerk.txt* Plugin for working with Salesforce sfdx projects
+
+====================================================================
+
+                    ▌        ▗▀▖▐            ▌               
+                    ▌▗▘▙▀▖▝▀▖▐  ▜▀ ▌  ▌▞▀▖▙▀▖▌▗▘
+                    ▛▚ ▌  ▞▀▌▜▀ ▐ ▖▐▐▐ ▛▀ ▌  ▛▚ 
+                    ▘ ▘▘  ▝▀▘▐   ▀  ▘▘ ▝▀▘▘  ▘ ▘
+
+    das Kraftwerk - German: Power plant, literally "force works"
+
+====================================================================
+Author:     Stephan Spiegel <stephan@stephanspiegel.com>
+Source:     https://github.com/StephanSpiegel/kraftwerk.nvim
+Version:    0.1.0
+====================================================================
+CONTENTS                                         *kraftwerk-contents*
+
+    1. Usage ......................... |kraftwerk-usage|
+    2. Commands ...................... |kraftwerk-commands|
+        2.1. ForceSourcePush ................... |ForceSourcePush|
+        2.2. ForceApexTestRun .................. |ForceApexTestRun|
+        2.3. ForceApexExecute .................. |ForceApexExecute|
+        2.4. ForceDataSoqlQuery ................ |ForceDataSoqlQuery|
+    3. License ....................... |kraftwerk-license|
+    4. Credits ....................... |kraftwerk-credits|
+
+====================================================================
+USAGE                                               *kraftwerk-usage*
+
+Requires https://developer.salesforce.com/tools/sfdxcli to be installed 
+Run `:checkhealth kraftwerk` to check whether kraftwerk can find it.
+
+This plugin provides no mappings. Invoke it using|kraftwerk-comands|
+
+====================================================================
+COMMANDS                                         *kraftwerk-commands*
+
+Most commands try to follow the naming structure of the original
+sfdx-cli commands. For example, |ForceSourcePush| is equivalent to
+`sfdx force:source:push`
+
+Most commands take an optional `<alias>`argument as the last
+argument, allowing them to be run against a different org than the
+original org.
+
+                                                   *ForceSourcePush*
+:ForceSourcePush <alias>                          
+
+    Push local changes to the org specified with `<alias>`, or the default
+    org if not specified.
+
+                                                  *ForceApexTestRun*
+:ForceApexTestRun <test_class_or_method> <alias>   
+
+    Start a unit test run. If `<test_class_or_method>` is specified, run
+    either all tests in the class, or run the given test method.
+    Defaults to the test class open in the current buffer.
+
+                                                  *ForceApexExecute*
+:ForceApexExecute <alias>
+
+    Take the visual selection and run it as Anonymous Apex in the
+    org specified with `<alias>` or the default org. Opens
+    the result in its own buffer.
+
+                                                *ForceDataSoqlQuery*
+:ForceDataSoqlQuery <format> <alias>
+    
+    Take the visual selection and run a SOQL query with it.
+    `<format>` can be one of "human", "csv", "json" or "table"
+    (default is "human"). If `<alias>` is provided, run the query in
+    the specified org, otherwise in the default org. Opens the
+    result in its own buffer.
+
+====================================================================
+CREDITS                                           *kraftwerk-credits*
+
+Written by Stephan Spiegel
+Inspired by https://github.com/neowit/vim-force.com
+
+====================================================================
+LICENSE                                           *kraftwerk-license*
+
+MIT
+
+Copyright 2021 Stephan Spiegel
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation files
+(the "Software"), to deal in the Software without restriction,
+including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software,
+and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

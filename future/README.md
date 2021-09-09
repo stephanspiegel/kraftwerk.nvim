@@ -4,7 +4,7 @@
 
 This plugin adds wrapper commands and utilities to work on a modern Salesforce project in source format using sfdx-cli
 
-For a much more mature plugin for working with older Salesforce projects in metadata API format, see [vim-force.com](https://github.com/neowit/vim-force.com) (vim only)
+For a much more mature plugin for working with older Salesforce projects in metadata API format, see [vim-force.com](https://github.com/neowit/vim-force.com) (vim only - no neovim support)
 
 ## Dependencies
 
