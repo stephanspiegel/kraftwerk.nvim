@@ -99,14 +99,10 @@ local function output(output_data)
 end
 
 local function gather_args(expected_args, args)
-    print('args:')
-    dump(args)
     if args == nil then args = {} end
     local processed_args = {}
     for index, arg_definition in ipairs(expected_args) do
         local arg_value = args[index]
-        print('arg_value')
-        dump(arg_value)
         if text.is_blank(arg_value) then
             if functor.has_key(arg_definition, 'required') and arg_definition.required == true then
                 local err = 'Missing required argument: ' .. arg_definition.name
