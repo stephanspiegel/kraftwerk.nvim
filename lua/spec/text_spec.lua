@@ -68,4 +68,70 @@ describe('text', function()
         end)
     end)
 
+    describe('contains', function()
+
+        it('should return true if test string contains test value', function()
+            assert.is_true(text.contains('b', 'abc'))
+        end)
+
+        it("should return curried function if no test string specified", function()
+            local contains_yes = text.contains('yes')
+            assert.is_true(contains_yes('anser yes or no'))
+        end)
+
+        it('should return false if test string is nil', function()
+            local contains_b = text.contains('b')
+            assert.is_false(contains_b(nil))
+        end)
+
+        it('should return false if test string is empty', function()
+            assert.is_false(text.contains('b', ''))
+        end)
+
+        it('should return false if test value is nil', function()
+            assert.is_false(text.contains(nil, 'abc'))
+        end)
+
+        it('should return false if test value is empty', function()
+            assert.is_false(text.contains('', 'abc'))
+        end)
+
+    end)
+
+    describe('is_newline_delimited', function()
+
+        it('should return true if test string contains newline', function()
+            assert.is_true(text.is_newline_delimited('line1\nline2'))
+        end)
+
+        it('should return false if test string doesn\'t contain newline', function()
+            assert.is_false(text.is_newline_delimited('this text is free of newlines'))
+        end)
+
+        it('should return false if test string contains newlines only at beginning and end', function()
+            assert.is_false(text.is_newline_delimited('\ntext surrounded, but not delimited by newlines\n'))
+        end)
+
+    end)
+
+    describe('is_nil_or_empty', function()
+
+        it('should return true if test string is nil', function()
+            assert.is_true(text.is_nil_or_empty(nil))
+        end)
+
+        it('should return true if test string is empty', function()
+            assert.is_true(text.is_nil_or_empty(''))
+        end)
+
+        it('should return false if test string contains alphabetic characters', function()
+            assert.is_false(text.is_nil_or_empty('   abc \n\n  '))
+        end)
+
+        it('should return false if test string consists of space', function()
+            assert.is_false(text.is_nil_or_empty(' '))
+        end)
+
+    end)
+
 end)

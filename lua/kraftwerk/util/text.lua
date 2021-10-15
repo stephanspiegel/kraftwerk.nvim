@@ -29,6 +29,15 @@ local function trim(text)
 end
 
 --[[
+Is the input either nil or empty?
+@tparam text string The string we want to check
+@treturn boolean True if the string is nil or empty string, false otherwise
+]]
+local function is_nil_or_empty(text)
+    return text == nil or text == ''
+end
+
+--[[
 Is the input either nil, empty or composed of only whitespace?
 @tparam text string The string we want to check
 @treturn boolean True if the string is nil, empty string or whitespace only, false otherwise
@@ -53,9 +62,28 @@ local function split(text, separator)
     return parts
 end
 
+local function contains(test_value, text)
+    local function curried_function(later_text)
+        if is_nil_or_empty(later_text) then return false end
+        if is_nil_or_empty(test_value) then return false end
+        local result = string.find(later_text, test_value) ~= nil
+        return result
+    end
+    if text == nil then return curried_function
+    else return curried_function(text)
+    end
+end
+
+local function is_newline_delimited(text)
+    return contains('\n', trim(text))
+end
+
 return {
-    starts_with = starts_with,
+    contains = contains,
     is_blank = is_blank,
+    is_newline_delimited = is_newline_delimited,
+    is_nil_or_empty = is_nil_or_empty,
+    split = split,
+    starts_with = starts_with,
     trim = trim,
-    split = split
 }
