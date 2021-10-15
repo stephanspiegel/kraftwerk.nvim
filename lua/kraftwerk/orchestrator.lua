@@ -121,7 +121,8 @@ local function get_command_definition(module_name, name)
     return command_definition
 end
 
-local function register(module_name, command)
+local function register(command_pairs)
+    local module_name, command = unpack(command_pairs)
     local command_definition = get_command_definition(module_name, command)
     local completion_function_name = register_completion(command_definition)
     local command_string = build_command_string(command_definition, completion_function_name)
