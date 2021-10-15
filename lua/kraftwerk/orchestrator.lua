@@ -3,24 +3,40 @@ local sfdx_runner = require('kraftwerk.sfdx_runner')
 local functor = require('kraftwerk.util.functor')
 local text = require('kraftwerk.util.text')
 
+local ranged_contents = {
+    'range_or_current_file',
+    'range_or_current_line'
+}
+
+local function is_range_command(command_data)
+    local expected_input = command_data.expected_input
+    return functor.has_key(expected_input, 'content')
+        and functor.contains(ranged_contents, expected_input.content.source)
+end
+
+local function is_bang_command(command_data)
+    local expected_input = command_data.expected_input
+    return functor.has_key(expected_input, 'bang') and expected_input.bang
+end
+
 local call = function(module_name, command, ...)
     local command_args = {...}
     local range, args
     local bang = false
     local command_module = require('kraftwerk.commands.'..module_name)[command]
     local expected_input = command_module.expected_input
-    if functor.has_key(expected_input, 'bang') and expected_input.bang then
+    if is_bang_command(command_module) then
         bang = command_args[1] == '!'
         command_args = functor.slice(command_args, 2)
     end
-    if #command_args == 4 then -- range command, first 3 arguments are about the range
+    if is_range_command(command_module) then -- range command, first 3 arguments are about the range
         range = functor.slice(command_args, 1, 3)
-        args = vim.split(command_args[4], '%s+')
+        args = text.split(command_args[4], '%s+')
     else -- not a range command, any args are user-entered
         range = {}
         args = {}
         if #command_args > 0 then
-            args = vim.split(command_args[1], '%s+')
+            args = text.split(command_args[1], '%s+')
         end
     end
     local input_result = io_handler.gather_input(expected_input, bang, range, args)
@@ -37,6 +53,10 @@ local call = function(module_name, command, ...)
         io_handler.output(command_output)
     end
     local sfdx_call = command_module.sfdx_call
+    if sfdx_call == 'none' then
+        orchestrator_callback()
+        return
+    end
     sfdx_runner[sfdx_call](sfdx_command, orchestrator_callback)
 end
 
