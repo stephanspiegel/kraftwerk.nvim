@@ -295,20 +295,35 @@ local function filter(predicate, list)
     end
 end
 
+local function any(predicate, list)
+    local function curried_function(later_list)
+        for _, value in ipairs(later_list) do
+            if predicate(value) then return true end
+        end
+        return false
+    end
+    if list == nil then
+        return curried_function
+    else
+        return curried_function(list)
+    end
+end
+
 return {
+    any = any,
     append = append,
+    clone = clone,
     concat = concat,
     contains = contains,
-    has_key = has_key,
     contains_value = contains_value,
     deepcopy = deepcopy,
     filter = filter,
     flatmap = flatmap,
     fold = fold,
+    has_key = has_key,
     intersperse = intersperse,
     is_nil_or_empty = is_nil_or_empty,
     keys = keys,
     map = map,
     slice = slice,
-    clone = clone
 }

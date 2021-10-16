@@ -343,4 +343,39 @@ describe("functor", function()
 
     end)
 
+    describe('any()', function()
+
+        it('should return "false" if no element satisfies the predicate', function()
+            local is_five = function(value) return value == 5 end
+            local numbers = { 1, 2, 3, 4 }
+            assert.is_false(functor.any(is_five, numbers))
+        end)
+
+        it('should return "true" if one element satisfies the predicate', function()
+            local is_five = function(value) return value == 5 end
+            local numbers = { 1, 2, 3, 4, 5 }
+            assert.is_true(functor.any(is_five, numbers))
+        end)
+
+        it('should return "true" if all elements satisfy the predicate', function()
+            local is_five = function(value) return value == 5 end
+            local numbers = { 5, 5, 5, 5, 5 }
+            assert.is_true(functor.any(is_five, numbers))
+        end)
+
+        it('should return a curried function if no second parameter is provided for the list', function()
+            local is_five = function(value) return value == 5 end
+            local numbers = { 1, 5 }
+            local contains_a_five = functor.any(is_five)
+            assert.is_true(contains_a_five(numbers))
+        end)
+
+        it('should return "false" if the list is empty', function()
+            local is_five = function(value) return value == 5 end
+            local numbers = {}
+            assert.is_false(functor.any(is_five, numbers))
+        end)
+
+    end)
+
 end)
