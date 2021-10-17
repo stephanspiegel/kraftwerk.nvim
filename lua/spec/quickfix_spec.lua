@@ -108,4 +108,53 @@ describe('quickfix', function()
 
     end)
 
+    describe('parse_lines_from_stack_trace', function()
+
+        it('should parse newline-delimited stack trace', function()
+            local stack_trace = [[
+Some inconsequential line here
+AcraliniException: No Noids allowed!
+
+Class.World_StateTriggerHandler: line 6, column 1
+Trigger.WorldState: line 2, column 1
+Another inconsequential line
+            ]]
+            local expected =
+            { {
+                col = "1",
+                filename = "${file_path_to:World_StateTriggerHandler.cls}",
+                lnum = "6",
+                module = "Class.World_StateTriggerHandler",
+                text = "AcraliniException: No Noids allowed!"
+              }, {
+                col = "1",
+                filename = "${file_path_to:WorldState.trigger}",
+                lnum = "2",
+                module = "Trigger.WorldState",
+                text = "    ... Continued"
+              } }
+            assert.same(expected, quickfix.parse_lines_from_stack_trace(stack_trace))
+        end)
+
+        it('should parse inline stack trace', function()
+            local stack_trace = "Class.GameEngineTest.itShouldAllowWorldStateNamedNoid|81 col 1| System.DmlException: Insert failed. First exception on row 0; first error: CANNOT_INSERT_UPDATE_ACTIVATE_ENTITY, WorldState: execution of BeforeInsert caused by: AcraliniException: No Noids allowed! Class.World_StateTriggerHandler: line 6, column 1 Trigger.WorldState: line 2, column 1: []"
+            local expected =
+            { {
+                col = "1",
+                filename = "${file_path_to:World_StateTriggerHandler.cls}",
+                lnum = "6",
+                module = "Class.World_StateTriggerHandler",
+                text = "Class.GameEngineTest.itShouldAllowWorldStateNamedNoid|81 col 1| System.DmlException: Insert failed. First exception on row 0; first error: CANNOT_INSERT_UPDATE_ACTIVATE_ENTITY, WorldState: execution of BeforeInsert caused by: AcraliniException: No Noids allowed!"
+              }, {
+                col = "1",
+                filename = "${file_path_to:WorldState.trigger}",
+                lnum = "2",
+                module = "Trigger.WorldState",
+                text = "    ... Continued"
+              } }
+            assert.same(expected, quickfix.parse_lines_from_stack_trace(stack_trace))
+        end)
+
+    end)
+
 end)

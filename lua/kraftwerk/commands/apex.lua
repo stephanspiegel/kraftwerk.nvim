@@ -45,7 +45,8 @@ local function build_testrun_command(input)
     if functor.has_key(input, 'user') then
         user_clause = ' --targetusername=' .. input.user
     end
-    sfdx_command = sfdx_command .. test_article_clause .. user_clause
+    local sync_clause = ' -y'
+    sfdx_command = sfdx_command .. test_article_clause .. user_clause .. sync_clause
     local function testrun_callback(sfdx_result)
         local result = sfdx_result.result
         if not functor.has_key(result, 'summary') then
@@ -60,11 +61,9 @@ local function build_testrun_command(input)
             else
                 table.insert(io_data.messages.info, 'All tests passed')
             end
-            dump(io_data)
             return io_data
         end
     end
-    print('command: '.. sfdx_command)
     return sfdx_command, testrun_callback
 end
 
@@ -149,8 +148,46 @@ local execute_command = {
 
 }
 
+local expected_unstack_input = {
+    content = {
+        source = 'range_or_current_line',
+        format = 'text',
+        required = true
+    }
+}
+
+local function build_unstack_command(input)
+    local lines = input.content
+    local function unstack_callback()
+        local quickfix_entries = quickfix.parse_lines_from_stack_trace(lines)
+        functor.map(function(entry)
+            -- in an "unstack" context we don't know which file AnonymousBlock refers to, so remove the reference to the current buffer
+            if functor.has_key(entry, 'bufnr') and entry['bufnr'] == '${current_buffer_number}' then
+                entry['bufnr'] = nil
+            end
+        end, quickfix_entries)
+        local io_data = {
+            quickfix = quickfix_entries
+        }
+        return io_data
+    end
+    return '', unstack_callback
+end
+
+local unstack_comand = {
+    meta = {
+        module = 'apex',
+        name = 'unstack',
+        command_name = 'ForceApexUnstack'
+    },
+    expected_input = expected_unstack_input,
+    build_command = build_unstack_command,
+    sfdx_call = 'none'
+}
+
 return {
     testrun = testrun_command,
     complete_test_file_or_method = complete_test_file_or_method,
-    execute = execute_command
+    execute = execute_command,
+    unstack = unstack_comand,
 }

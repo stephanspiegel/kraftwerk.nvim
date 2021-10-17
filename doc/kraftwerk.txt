@@ -1,6 +1,4 @@
-*kraftwerk.txt* Plugin for working with Salesforce sfdx projects
-
-====================================================================
+  *kraftwerk.txt* Plugin for working with Salesforce sfdx projects
 
                     ▌        ▗▀▖▐            ▌               
                     ▌▗▘▙▀▖▝▀▖▐  ▜▀ ▌  ▌▞▀▖▙▀▖▌▗▘
@@ -9,10 +7,9 @@
 
     das Kraftwerk - German: Power plant, literally "force works"
 
-====================================================================
 Author:     Stephan Spiegel <stephan@stephanspiegel.com>
 Source:     https://github.com/StephanSpiegel/kraftwerk.nvim
-Version:    0.1.0
+Version:    0.1.1
 ====================================================================
 CONTENTS                                         *kraftwerk-contents*
 
@@ -21,9 +18,12 @@ CONTENTS                                         *kraftwerk-contents*
         2.1. ForceSourcePush ................... |ForceSourcePush|
         2.2. ForceApexTestRun .................. |ForceApexTestRun|
         2.3. ForceApexExecute .................. |ForceApexExecute|
-        2.4. ForceDataSoqlQuery ................ |ForceDataSoqlQuery|
-    3. License ....................... |kraftwerk-license|
-    4. Credits ....................... |kraftwerk-credits|
+        2.4. ForceApexUnstack .................. |ForceApexUnstack|
+        2.5. ForceDataSoqlQuery ................ |ForceDataSoqlQuery|
+    3. Configuration ................. |kraftwerk-configuration|
+    4. Release Notes ................. kraftwerk-releasenotes
+    5. License ....................... |kraftwerk-license|
+    6. Credits ....................... |kraftwerk-credits|
 
 ====================================================================
 USAGE                                               *kraftwerk-usage*
@@ -64,6 +64,13 @@ original org.
     org specified with `<alias>` or the default org. Opens
     the result in its own buffer.
 
+                                                  *ForceApexUnstack*
+:ForceApexUnstack
+
+    Take the visual selection and try to parse quickfix items from it.
+    Use this get quickfix populated from an Apex log that contains
+    a stacktrace.
+
                                                 *ForceDataSoqlQuery*
 :ForceDataSoqlQuery <format> <alias>
     
@@ -74,6 +81,25 @@ original org.
     result in its own buffer.
 
 ====================================================================
+CONFIGURATION                                *kraftwerk-configuration*
+
+					 *g:kraftwerk_sfdx_executable*
+The name of the sfdx executable to use. If no path provided, the 
+executable should be in a $PATH directory.
+
+				       *g:kraftwerk_sfdx_alias_config*
+The file holding org alias information. By default, Salesforce puts 
+the config in `$HOME/.sfdx/alias.json` for Unix-like systems. If 
+your config is somewhere else (Windows?), change the value of this 
+global variable.
+
+====================================================================
+RELEASE NOTES                                *kraftwerk-releasenotes*
+
+0.1.1
+    * Add :ForceApexUnstack command
+
+====================================================================
 CREDITS                                           *kraftwerk-credits*
 
 Written by Stephan Spiegel
@@ -82,7 +108,7 @@ Inspired by https://github.com/neowit/vim-force.com
 ====================================================================
 LICENSE                                           *kraftwerk-license*
 
-MIT
+    MIT
 
 Copyright 2021 Stephan Spiegel
 
@@ -97,14 +123,14 @@ subject to the following conditions:
 The above copyright notice and this permission notice shall be
 included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
-BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+    BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+    ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
 
 
  vim:tw=78:ts=8:noet:ft=help:norl:
