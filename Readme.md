@@ -30,7 +30,7 @@ use { 'stephanspiegel/kraftwerk.vim', }
 
 ### Commands
 
-Most commands take an optional <alias> argument as the last argument, allowing them to be run against a different org than the current default. 
+Most commands take an optional `<alias>` argument as the last argument, allowing them to be run against a different org than the current default. 
 
 #### :ForceDataSoqlQuery <format> <alias>
 Runs a SOQL query on a query highlighted in visual mode. Format can be one of:
