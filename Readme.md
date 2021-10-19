@@ -53,6 +53,12 @@ Start a unit test run. If <test class or method> is given, run all tests in the 
 
 Run the visual selection as Anonymous Apex. The result log will be opened in its own buffer.
 
+#### :ForceApexUnstack
+
+Take the visual selection and try to parse quickfix items from it.
+You could use this to get the quickfix populated from an Apex log that contains
+a stacktrace.
+
 ## Goes well with
 
 ### Apex Language Server

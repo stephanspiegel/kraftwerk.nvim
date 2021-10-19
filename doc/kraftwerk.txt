@@ -68,8 +68,8 @@ original org.
 :ForceApexUnstack
 
     Take the visual selection and try to parse quickfix items from it.
-    Use this get quickfix populated from an Apex log that contains
-    a stacktrace.
+    You could use this to get the quickfix populated from an Apex log 
+    that contains a stacktrace.
 
                                                 *ForceDataSoqlQuery*
 :ForceDataSoqlQuery <format> <alias>
