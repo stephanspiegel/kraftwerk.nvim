@@ -1,16 +1,16 @@
 local sfdx_runner = require("kraftwerk.sfdx_runner")
+local health = require("health")
 
 local oldest_supported_version = "7.110.0"
 
 local function sfdx_is_installed()
     local sfdx_executable = 'sfdx'
-    if vim.g.kraftwerk_sfdx_executable ~= null then
+    if vim.g.kraftwerk_sfdx_executable ~= nil then
         sfdx_executable = vim.g.kraftwerk_sfdx_executable
     end
     local is_installed = vim.fn.executable(sfdx_executable)
     return (is_installed == 1)
 end
-
 
 local function version_parts(version)
     local major, minor, patch = string.match(version, "(%d+)%.(%d+)%.(%d+)")
@@ -31,20 +31,12 @@ local function version_is_supported(version_number)
     end
 end
 
-local function report_ok(message)
-    vim.call("health#report_ok", message)
-end
-
-local function report_error(message, suggestions)
-    vim.call("health#report_error", message, suggestions)
-end
-
 local function check_health()
-    vim.call("health#report_start", "Check sfdx-cli")
+    health.report_start("Check sfdx-cli")
     if sfdx_is_installed() then
-        report_ok("Found sfdx executable")
+        health.report_ok("Found sfdx executable")
     else
-        report_error("Couldn't find sfdx", {
+        health.report_error("Couldn't find sfdx", {
                 "run in shell: npm install sfdx-cli --global",
                 "see install instructions: https://developer.salesforce.com/tools/sfdxcli",
                 "make sure sfdx is in your path environment variable",
@@ -54,11 +46,21 @@ local function check_health()
     end
     local version_result = sfdx_runner.call_sfdx_sync('version')
     local version_number = string.gsub(version_result.cliVersion,"sfdx%-cli/", "")
+    if version_result.preamble then
+        health.report_info(version_result.preamble)
+    end
     if version_is_supported(version_number) then
-        report_ok("Up to date")
+        health.report_ok("Found oldest supported version or newer")
     else
-        report_error("Outdated version " .. version_number .." found. Must have at least " .. oldest_supported_version, {
-                "run in shell: sfdx update"
+        health.report_error(
+                string.format(
+                        "%s %s %s %s",
+                        "Outdated version",
+                        version_number,
+                        "found. Must have at least",
+                        oldest_supported_version
+                ), {
+                    "run in shell: sfdx update"
         })
         return
     end
