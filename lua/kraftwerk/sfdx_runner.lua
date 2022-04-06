@@ -1,4 +1,5 @@
 local echo = require("kraftwerk.util.echo")
+local functor = require("kraftwerk.util.functor")
 local json = require('kraftwerk.util.json')
 local text = require('kraftwerk.util.text')
 
@@ -58,7 +59,7 @@ local function call_sfdx_raw(command, callback)
 end
 
 --[[--
-Calls sfdx asynchronously. Only use if the calling context doesn't support callbacks
+Calls sfdx synchronously. Only use if the calling context doesn't support callbacks
 ]]
 local function call_sfdx_sync_raw(command)
     local result = vim.fn.systemlist(build_command(command))
@@ -66,13 +67,25 @@ local function call_sfdx_sync_raw(command)
 end
 
 local function json_decoder(data)
-    local json_data = table.concat(data, "\n")
+    local preamble_lines = {}
+    local i, line = next(data, nil)
+    local starts_with_bracket = '^{'
+    while line:find(starts_with_bracket) == nil do
+        preamble_lines = functor.append(preamble_lines, line)
+        i, line = next(data, i)
+    end
+    local json_lines = functor.slice(data, i)
+    local json_data = table.concat(json_lines, "\n")
     local result = json.decode(json_data)
+    if not functor.is_nil_or_empty(preamble_lines) then
+        result['preamble'] = table.concat(preamble_lines, "\n")
+    end
     return result
 end
 
 --[[--
-Calls sfdx asynchronously with the "--json" switch, and returns result as a table. Only use if the calling context doesn't support callbacks
+Calls sfdx synchronously with the "--json" switch, and returns result as a table.
+Only use if the calling context doesn't support callbacks
 ]]
 local function call_sfdx_sync(command)
     local result = call_sfdx_sync_raw(command .. " --json")
