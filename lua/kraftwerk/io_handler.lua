@@ -29,11 +29,14 @@ local interpolators = {
     current_buffer_number = function() return vim.fn.bufnr('%') end,
 }
 
-local function interpolate(source_string)
-    if not text.starts_with('${', source_string) then
-        return source_string
+local function interpolate(source_value)
+    if type(source_value) ~= 'string' then
+        return source_value
     end
-    local interpolation_key = string.match(source_string, '${([^}]*)}')
+    if not text.starts_with('${', source_value) then
+        return source_value
+    end
+    local interpolation_key = string.match(source_value, '${([^}]*)}')
     local function interpolate_keys(acc, pattern)
         local data = string.match(interpolation_key, pattern)
         if data ~= nil then
