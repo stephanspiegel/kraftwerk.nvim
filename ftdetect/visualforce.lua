@@ -1,14 +1,9 @@
 local ft_commands = -- { pattern, filteype }
-{ { "*/src/classes/*.cls", "apexcode" }
-, { "*/src/triggers/*.trigger", "apexcode" }
-, { "*/force-app/**/classes/*.cls", "apexcode" }
-, { "*/force-app/**/triggers/*.trigger", "apexcode" }
-, { "*.apex", "apexcode" }
-, { "*.soql", "soql" }
-, { "*.apexcode", "apexcode" }
+{ { "*/src/pages/*.page", "visualforce" }
+, { "*/force-app/**/pages/*.page", "visualforce" }
 }
 
-vim.api.nvim_command("augroup apex")
+vim.api.nvim_command("augroup visualforce")
 vim.api.nvim_command "autocmd!"
 for _, def in ipairs(ft_commands) do
     local pattern = def[1]
@@ -17,4 +12,3 @@ for _, def in ipairs(ft_commands) do
     vim.api.nvim_command(command)
 end
 vim.api.nvim_command "augroup END"
-
