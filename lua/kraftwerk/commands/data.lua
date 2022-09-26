@@ -33,7 +33,11 @@ local function build_query_command(input)
     if functor.has_key(input, 'user') then
         user_clause = ' --targetusername=' .. input.user
     end
-    sfdx_command = sfdx_command .. result_format_clause .. user_clause
+    local tooling_api_clause = ''
+    if input.bang then
+        tooling_api_clause = ' --usetoolingapi'
+    end
+    sfdx_command = sfdx_command .. result_format_clause .. user_clause .. tooling_api_clause
     local function query_callback(result)
         -- todo: add markdown table handling
         if processor ~= nil then
@@ -73,6 +77,7 @@ local expected_query_input = {
             complete = completion.user
         }
     },
+    bang = true,
     content = {
         source = 'range_or_current_line',
         format = 'text',

@@ -50,6 +50,9 @@ original org.
     Push local changes to the org specified with `<alias>`, or the default
     org if not specified.
 
+:ForceSourcePush! <alias>                          
+    Push local changes using the '--forceoverwrite' option
+
                                                   *ForceApexTestRun*
 :ForceApexTestRun <test_class_or_method> <alias>   
 
@@ -71,6 +74,7 @@ original org.
     You could use this to get the quickfix populated from an Apex log 
     that contains a stacktrace.
 
+
                                                 *ForceDataSoqlQuery*
 :ForceDataSoqlQuery <format> <alias>
     
@@ -79,6 +83,10 @@ original org.
     (default is "human"). If `<alias>` is provided, run the query in
     the specified org, otherwise in the default org. Opens the
     result in its own buffer.
+
+:ForceDataSoqlQuery! <format> <alias>
+
+    Same as ForceDataSoqlQuery, but run the query with the Tooling API.
 
 ====================================================================
 CONFIGURATION                                *kraftwerk-configuration*
