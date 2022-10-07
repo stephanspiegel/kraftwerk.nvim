@@ -1,6 +1,6 @@
 local orchestrator = require('kraftwerk.orchestrator')
-local defaults = require('kraftwerk.defaults')
 local functor = require('kraftwerk.util.functor')
+local config = require('kraftwerk.config')
 
 _G.kraftwerk = {
     command_completion = {}
@@ -19,15 +19,9 @@ local function define_commands()
     functor.map(orchestrator.register, commands)
 end
 
-local function define_globals()
-    for key, value in pairs(defaults.globals) do
-        vim.g[key] = vim.g[key] or value
-    end
-end
-
-local function setup()
+local function setup(user_config)
     define_commands()
-    define_globals()
+    config.setup(user_config)
 end
 
 return {

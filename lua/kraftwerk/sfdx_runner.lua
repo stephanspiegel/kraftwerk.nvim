@@ -2,9 +2,10 @@ local echo = require("kraftwerk.util.echo")
 local functor = require("kraftwerk.util.functor")
 local json = require('kraftwerk.util.json')
 local text = require('kraftwerk.util.text')
+local config = require('kraftwerk.config')
 
 local function build_command(command)
-    local sfdx_executable = vim.g.kraftwerk_sfdx_executable or 'sfdx'
+    local sfdx_executable = config.get('sfdx_executable') or 'sfdx'
     local sfdx_command = sfdx_executable .. " " .. command
     return sfdx_command
 end
@@ -66,7 +67,7 @@ local function call_sfdx_sync_raw(command)
     return result
 end
 
-local function json_decoder(data)
+local function json_decode(data)
     local preamble_lines = {}
     local i, line = next(data, nil)
     local starts_with_bracket = '^{'
@@ -89,7 +90,12 @@ Only use if the calling context doesn't support callbacks
 ]]
 local function call_sfdx_sync(command)
     local result = call_sfdx_sync_raw(command .. " --json")
-    return json_decoder(result)
+    local decode_succeeded, decoded_result =  pcall(json_decode, result)
+    if not decode_succeeded then
+        vim.notify('kraftwerk: error decoding json for command '..command..': '..vim.inspect(result))
+        return {}
+    end
+    return json_decode(result)
 end
 
 --[[--
@@ -99,7 +105,7 @@ Calls sfdx with the "--json" switch, the calls "callback" with the result as a t
 ]]
 local function call_sfdx(command, callback)
     local function json_callback(data)
-        callback(json_decoder(data))
+        callback(json_decode(data))
     end
     call_sfdx_raw(command .. " --json", json_callback)
 end

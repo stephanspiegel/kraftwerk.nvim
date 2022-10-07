@@ -1,14 +1,21 @@
 local sfdx_runner = require("kraftwerk.sfdx_runner")
-local health = require("health")
+local health = vim.health
+local config = require("kraftwerk.config")
+local functor = require("kraftwerk.util.functor")
 
 local oldest_supported_version = "7.110.0"
 
-local function sfdx_is_installed()
+local function get_sfdx_executable()
     local sfdx_executable = 'sfdx'
-    if vim.g.kraftwerk_sfdx_executable ~= nil then
-        sfdx_executable = vim.g.kraftwerk_sfdx_executable
+    local executable = config.get('sfdx_executable')
+    if  executable ~= nil then
+        sfdx_executable = executable
     end
-    local is_installed = vim.fn.executable(sfdx_executable)
+    return sfdx_executable
+end
+
+local function sfdx_is_installed()
+    local is_installed = vim.fn.executable(get_sfdx_executable())
     return (is_installed == 1)
 end
 
@@ -45,12 +52,22 @@ local function check_health()
         return
     end
     local version_result = sfdx_runner.call_sfdx_sync('version')
+    if not functor.has_key(version_result, 'cliVersion') then
+        local advice = {}
+        local sfdx_executable = get_sfdx_executable()
+        if sfdx_executable ~= 'sfdx' then
+            table.insert(advice, 'The sfdx_executable is configured to be `'..sfdx_executable..'`. Is this correct?')
+            table.insert(advice, 'Make sure that `'..sfdx_executable..'` resolves to the sfdx-cli executable file')
+        end
+        health.report_error("`sfdx version` returned unexpected result", advice)
+        return
+    end
     local version_number = string.gsub(version_result.cliVersion,"sfdx%-cli/", "")
     if version_result.preamble then
         health.report_info(version_result.preamble)
     end
     if version_is_supported(version_number) then
-        health.report_ok("Found oldest supported version or newer")
+        health.report_ok("Installed version is "..version_number.." (oldest supported version: "..oldest_supported_version..")")
     else
         health.report_error(
                 string.format(

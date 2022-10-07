@@ -91,11 +91,20 @@ original org.
 ====================================================================
 CONFIGURATION                                *kraftwerk-configuration*
 
-					 *g:kraftwerk_sfdx_executable*
+If you don't like the defaults, call >
+    require('kraftwerk).setup()
+<passing in a setup object. The defaults look like this:
+>
+    {
+	sfdx_alias_config = '$HOME/.sfdx/alias.json',
+	sfdx_executable = 'sfdx',
+    }
+<
+					            *sfdx_executable*
 The name of the sfdx executable to use. If no path provided, the 
 executable should be in a $PATH directory.
 
-				       *g:kraftwerk_sfdx_alias_config*
+				                  *sfdx_alias_config*
 The file holding org alias information. By default, Salesforce puts 
 the config in `$HOME/.sfdx/alias.json` for Unix-like systems. If 
 your config is somewhere else (Windows?), change the value of this 
