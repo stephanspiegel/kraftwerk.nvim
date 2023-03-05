@@ -6,8 +6,8 @@ local config = require('kraftwerk.config')
 
 local function build_command(command)
     local sfdx_executable = config.get('sfdx_executable') or 'sfdx'
-    local sfdx_command = sfdx_executable .. " " .. command
-    return sfdx_command
+    table.insert( command, 1, sfdx_executable )
+    return command
 end
 
 --[[--
@@ -47,7 +47,7 @@ local function call_sfdx_raw(command, callback)
         callback(result)
     end
 
-    local job_id = vim.fn.jobstart(
+    vim.fn.jobstart(
         build_command(command),
         {
             on_stderr = on_stderr,
@@ -89,7 +89,8 @@ Calls sfdx synchronously with the "--json" switch, and returns result as a table
 Only use if the calling context doesn't support callbacks
 ]]
 local function call_sfdx_sync(command)
-    local result = call_sfdx_sync_raw(command .. " --json")
+    table.insert(command, "--json")
+    local result = call_sfdx_sync_raw(command)
     local decode_succeeded, decoded_result =  pcall(json_decode, result)
     if not decode_succeeded then
         vim.notify('kraftwerk: error decoding json for command '..command..': '..vim.inspect(result))
@@ -107,7 +108,8 @@ local function call_sfdx(command, callback)
     local function json_callback(data)
         callback(json_decode(data))
     end
-    call_sfdx_raw(command .. " --json", json_callback)
+    table.insert(command, "--json")
+    call_sfdx_raw(command, json_callback)
 end
 
 --[[

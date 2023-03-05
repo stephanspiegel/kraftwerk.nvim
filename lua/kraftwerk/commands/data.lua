@@ -16,8 +16,8 @@ local result_configs = {
 local function build_query_command(input)
     local query_string = input.content
     local format = input.format
-    local sfdx_command = 'force:data:soql:query'
-    sfdx_command = sfdx_command .. ' --query "' .. query_string .. '"'
+    local sfdx_command = {'data:query'}
+    table.insert(sfdx_command, '--query=' .. query_string)
     local result_config = result_configs[format]
     local result_format = format
     if functor.has_key(result_config, "format") then
@@ -28,16 +28,17 @@ local function build_query_command(input)
     if functor.has_key(result_config, "processor") then
         processor = result_config.processor
     end
-    local result_format_clause = "  --resultformat=" .. result_format
-    local user_clause = ''
+    local result_format_clause = "--result-format=" .. result_format
+    table.insert(sfdx_command, result_format_clause)
     if functor.has_key(input, 'user') then
-        user_clause = ' --targetusername=' .. input.user
+        local user_clause = '--target-org=' .. input.user
+        table.insert(sfdx_command, user_clause)
     end
-    local tooling_api_clause = ''
     if input.bang then
-        tooling_api_clause = ' --usetoolingapi'
+        local tooling_api_clause = ' --use-tooling-api'
+        table.insert(sfdx_command, tooling_api_clause)
     end
-    sfdx_command = sfdx_command .. result_format_clause .. user_clause .. tooling_api_clause
+    -- sfdx_command = sfdx_command .. result_format_clause .. user_clause .. tooling_api_clause
     local function query_callback(result)
         -- todo: add markdown table handling
         if processor ~= nil then

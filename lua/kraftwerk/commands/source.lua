@@ -38,15 +38,13 @@ end
 Call sfdx force:source:push.
 --]]
 local function build_push_command(input)
-    local user_clause = ''
-    local force_clause = ''
+    local sfdx_command = { 'force:source:push' }
     if functor.has_key(input, 'user') then
-        user_clause = ' --targetusername=' .. input.user
+        table.insert(sfdx_command, '--targetusername=' .. input.user)
     end
     if input.bang then
-        force_clause = ' --forceoverwrite'
+        table.insert(sfdx_command, '--forceoverwrite')
     end
-    local sfdx_command =  'force:source:push' .. user_clause .. force_clause
     return sfdx_command, push_callback
 end
 
@@ -68,7 +66,7 @@ end
 Call sfdx fource:source:pull.
 --]]
 local function build_pull_command()
-    return 'force:source:pull', pull_callback
+    return { 'force:source:pull' }, pull_callback
 end
 
 local pull_command = {

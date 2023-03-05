@@ -35,18 +35,17 @@ local function handle_failure(result)
 end
 
 local function build_testrun_command(input)
-    local sfdx_command = 'force:apex:test:run'
+    local sfdx_command = { 'apex:run:test' }
     local test_article = vim.fn.expand('%:t:r:') -- default: current file
     if functor.has_key(input, 'file_or_method') and not text.is_blank(input.file_or_method) then
         test_article = input.file_or_method
     end
-    local test_article_clause = ' --tests=' .. test_article
+    table.insert(sfdx_command, '--tests=' .. test_article)
     local user_clause = ''
     if functor.has_key(input, 'user') then
-        user_clause = ' --targetusername=' .. input.user
+        table.insert(sfdx_command, '--targetusername=' .. input.user)
     end
-    local sync_clause = ' -y'
-    sfdx_command = sfdx_command .. test_article_clause .. user_clause .. sync_clause
+    table.insert(sfdx_command, '--synchronous')
     local function testrun_callback(sfdx_result)
         local result = sfdx_result.result
         if not functor.has_key(result, 'summary') then
@@ -125,15 +124,12 @@ local function execute_callback(result)
 end
 
 local function build_execute_command(input)
-    local sfdx_command_parts = {
-        'force:apex:execute'
-    }
-    sfdx_command_parts = functor.append(sfdx_command_parts, '--apexcodefile '..input.temp_file_path)
+    local sfdx_command_parts = { 'force:apex:execute' }
+    sfdx_command_parts = functor.append(sfdx_command_parts, '--apexcodefile='..input.temp_file_path)
     if functor.has_key(input, 'user') then
         sfdx_command_parts = functor.append(sfdx_command_parts, ' --targetusername=' .. input.user)
     end
-    local sfdx_command = table.concat(sfdx_command_parts, ' ')
-    return sfdx_command, execute_callback
+    return sfdx_command_parts, execute_callback
 end
 
 local execute_command = {

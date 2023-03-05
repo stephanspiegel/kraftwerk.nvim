@@ -3,7 +3,7 @@ local health = vim.health
 local config = require("kraftwerk.config")
 local functor = require("kraftwerk.util.functor")
 
-local oldest_supported_version = "7.110.0"
+local oldest_supported_version = "7.190.2"
 
 local function get_sfdx_executable()
     local sfdx_executable = 'sfdx'
@@ -51,7 +51,7 @@ local function check_health()
             })
         return
     end
-    local version_result = sfdx_runner.call_sfdx_sync('version')
+    local version_result = sfdx_runner.call_sfdx_sync({'version'})
     if not functor.has_key(version_result, 'cliVersion') then
         local advice = {}
         local sfdx_executable = get_sfdx_executable()
