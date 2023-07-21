@@ -60,7 +60,6 @@ Sends a SOQL query to sfdx.
 @param startline The line where the range for the command starts
 @param endline The line where the range for the command ends
 @param format The format of the result to return: "csv", "human", "json"
-@todo implement explicit line ranges (multi and single line)
 
 ]]
 
