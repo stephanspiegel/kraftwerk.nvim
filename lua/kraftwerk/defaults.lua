@@ -6,9 +6,9 @@ return {
         ]]
     },
     sfdx_executable = {
-        value = 'sfdx',
+        value = 'sf',
         doc = [[
-        Name of the sfdx executable. Useful if the executable has been aliased to something else, or for the full path if it's not in the $PATH.
+        Name of the sf command line executable. Useful if the executable has been aliased to something else, or for the full path if it's not in the $PATH.
         ]]
     },
 }
