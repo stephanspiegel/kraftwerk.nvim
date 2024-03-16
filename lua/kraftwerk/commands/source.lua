@@ -38,7 +38,7 @@ end
 Call sf project deploy start.
 --]]
 local function build_push_command(input)
-    local sfdx_command = { 'project deploy start' }
+    local sfdx_command = { 'project:deploy:start' }
     if functor.has_key(input, 'user') then
         table.insert(sfdx_command, '--target-org=' .. input.user)
     end
@@ -66,7 +66,7 @@ end
 Call sfdx project retrieve start.
 --]]
 local function build_pull_command()
-    return { 'project retrieve start' }, pull_callback
+    return { 'project:retrieve:start' }, pull_callback
 end
 
 local pull_command = {
