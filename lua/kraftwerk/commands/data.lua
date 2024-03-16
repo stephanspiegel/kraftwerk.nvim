@@ -16,7 +16,7 @@ local result_configs = {
 local function build_query_command(input)
     local query_string = input.content
     local format = input.format
-    local sfdx_command = {'data:query'}
+    local sfdx_command = {'data query'}
     table.insert(sfdx_command, '--query=' .. query_string)
     local result_config = result_configs[format]
     local result_format = format
@@ -55,7 +55,7 @@ local function build_query_command(input)
     return sfdx_command, query_callback
 end
 --[[--
-Sends a SOQL query to sfdx.
+Sends a SOQL query to sf.
 @param range Should either be 0 (no range included in command), 1 (":10ForceDataSoqlQuery, or 2 (a ":15,29ForceDataSoqlQuery" style range or visual selection)
 @param startline The line where the range for the command starts
 @param endline The line where the range for the command ends

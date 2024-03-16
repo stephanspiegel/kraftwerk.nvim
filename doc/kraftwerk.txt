@@ -97,11 +97,11 @@ If you don't like the defaults, call >
 >
     {
 	sfdx_alias_config = '$HOME/.sfdx/alias.json',
-	sfdx_executable = 'sfdx',
+	sfdx_executable = 'sf',
     }
 <
 					            *sfdx_executable*
-The name of the sfdx executable to use. If no path provided, the 
+The name of the sf-cli executable to use. If no path provided, the 
 executable should be in a $PATH directory.
 
 				                  *sfdx_alias_config*

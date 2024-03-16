@@ -8,7 +8,7 @@ local completion = require('kraftwerk.util.completion')
 
 --[[
 Callback for the force:push command
-@tparam result table The result received from sfdx as a table
+@tparam result table The result received from sf as a table
 --]]
 local function push_callback(result)
     local io_data = { messages = {} }
@@ -35,15 +35,15 @@ local function push_callback(result)
 end
 
 --[[--
-Call sfdx force:source:push.
+Call sf project deploy start.
 --]]
 local function build_push_command(input)
-    local sfdx_command = { 'force:source:push' }
+    local sfdx_command = { 'project deploy start' }
     if functor.has_key(input, 'user') then
-        table.insert(sfdx_command, '--targetusername=' .. input.user)
+        table.insert(sfdx_command, '--target-org=' .. input.user)
     end
     if input.bang then
-        table.insert(sfdx_command, '--forceoverwrite')
+        table.insert(sfdx_command, '--ignore-conflicts')
     end
     return sfdx_command, push_callback
 end
@@ -63,10 +63,10 @@ local function pull_callback(result)
 end
 
 --[[
-Call sfdx fource:source:pull.
+Call sfdx project retrieve start.
 --]]
 local function build_pull_command()
-    return { 'force:source:pull' }, pull_callback
+    return { 'project retrieve start' }, pull_callback
 end
 
 local pull_command = {

@@ -1,15 +1,15 @@
 # kraftwerk
 
-> A neovim plugin for working with Salesforce sfdx
+> A neovim plugin for working with Salesforce sf-cli
 
-This plugin adds wrapper commands and utilities to work on a modern Salesforce project in source format using sfdx-cli
+This plugin adds wrapper commands and utilities to work on a modern Salesforce project in source format using sf-cli
 
 For a much more mature plugin for working with older Salesforce projects in metadata API format, see [vim-force.com](https://github.com/neowit/vim-force.com) (vim only - no neovim support)
 
 ## Dependencies
 
 * neovim
-* [sfdx-cli](https://developer.salesforce.com/tools/sfdxcli)
+* [sf-cli](https://developer.salesforce.com/tools/salesforcecli)
 
 ## Installation
 

@@ -5,13 +5,13 @@ local text = require('kraftwerk.util.text')
 local config = require('kraftwerk.config')
 
 local function build_command(command)
-    local sfdx_executable = config.get('sfdx_executable') or 'sfdx'
+    local sfdx_executable = config.get('sfdx_executable') or 'sf'
     table.insert( command, 1, sfdx_executable )
     return command
 end
 
 --[[--
-Calls sfdx without appending "--json".
+Calls sf-cli without appending "--json".
 Calling code is responsible for parsing result.
 Returns a table with an entry for each line
 ]]
@@ -60,7 +60,7 @@ local function call_sfdx_raw(command, callback)
 end
 
 --[[--
-Calls sfdx synchronously. Only use if the calling context doesn't support callbacks
+Calls sf-cli synchronously. Only use if the calling context doesn't support callbacks
 ]]
 local function call_sfdx_sync_raw(command)
     local result = vim.fn.systemlist(build_command(command))
@@ -85,13 +85,13 @@ local function json_decode(data)
 end
 
 --[[--
-Calls sfdx synchronously with the "--json" switch, and returns result as a table.
+Calls sf-cli synchronously with the "--json" switch, and returns result as a table.
 Only use if the calling context doesn't support callbacks
 ]]
 local function call_sfdx_sync(command)
     table.insert(command, "--json")
     local result = call_sfdx_sync_raw(command)
-    local decode_succeeded, decoded_result =  pcall(json_decode, result)
+    local decode_succeeded, _ =  pcall(json_decode, result)
     if not decode_succeeded then
         vim.notify('kraftwerk: error decoding json for command '..command..': '..vim.inspect(result))
         return {}
@@ -100,8 +100,8 @@ local function call_sfdx_sync(command)
 end
 
 --[[--
-Calls sfdx with the "--json" switch, the calls "callback" with the result as a table.
-@param command The sfdx command to call, ie. "force:source:push"
+Calls sf-cli with the "--json" switch, the calls "callback" with the result as a table.
+@param command The sf command to call, ie. "force:source:push"
 @param callback Will be called with the result of running the sfdx command, as a table
 ]]
 local function call_sfdx(command, callback)
@@ -113,8 +113,8 @@ local function call_sfdx(command, callback)
 end
 
 --[[
-Doesn't call sfdx at all; instead just invokes the callback directly.
-Used for commands that don't wrap any sfdx-cli functionality. Assumes
+Doesn't call sf at all; instead just invokes the callback directly.
+Used for commands that don't wrap any sf-cli functionality. Assumes
 that the callback contains the "input" data from the build_command
 call as a closure, if it needs it
 @tparam command Not needed

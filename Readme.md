@@ -1,17 +1,17 @@
 # kraftwerk
 
-> A neovim plugin for working with Salesforce sfdx
+> A neovim plugin for working with Salesforce sf-cli
 
 _das Kraftwerk_ - German: Power plant, literally "force works"
 
-This plugin adds wrapper commands and utilities to work on a modern Salesforce project in source format using sfdx-cli
+This plugin adds wrapper commands and utilities to work on a modern Salesforce project in source format using sf-cli
 
 For a much more mature plugin for working with older Salesforce projects in metadata API format, see [vim-force.com](https://github.com/neowit/vim-force.com) (vim only - no neovim support)
 
 ## Dependencies
 
 * neovim v0.7.0 or higher
-* [sfdx-cli](https://developer.salesforce.com/tools/sfdxcli)
+* [sf-cli](https://developer.salesforce.com/tools/salesforcecli)
 
 ## Installation
 
@@ -27,6 +27,32 @@ Using [packer.nvim](https://github.com/wbthomason/packer.nvim)
 use { 'stephanspiegel/kraftwerk.vim', }
 ```
 
+Using [lazy.nvim](https://github.com/folke/lazy.nvim)
+
+```lua
+{
+    'stephanspiegel/kraftwerk.nvim',
+    config = true,
+    ft = { 'apexcode', 'soql' },
+    keys = {
+        {'gqq', 'mxvap:ForceDataSoqlQuery csv<CR>`x', mode = 'n', desc = 'Run current paragraph as SOQL query'},
+        {'gee', 'mxvap:ForceApexExecute<CR>`x', mode = 'n', desc = 'Run current paragraph as Anonymous Apex'},
+        {'gqq', ":'<,'>ForceDataSoqlQuery csv<CR>gv", mode = 'v', desc = 'Run selected text as SOQL query'},
+        {'gee', ":'<,'>ForceApexExecute<CR>gv", mode = 'v', desc = 'Run selected text as Anonymous Apex'}
+    },
+}
+```
+
+Alternatively, if you want to change any default settings, you can replace `config = true` with
+
+```lua
+opts = {
+    sfdx_alias_config = '$HOME/.sfdx/alias.json',
+    sfdx_executable = 'sf',
+},
+```
+(see section below)
+
 ## Configuration
 
 If you don't like the defaults, call `require('kraftwerk).setup()`, passing in a setup object. The defaults look like this:
@@ -34,11 +60,11 @@ If you don't like the defaults, call `require('kraftwerk).setup()`, passing in a
 ```lua
 {
     sfdx_alias_config = '$HOME/.sfdx/alias.json',
-    sfdx_executable = 'sfdx',
+    sfdx_executable = 'sf',
 }
 ```
 * `sfdx_alias_config`: Location of the `alias.json` file which sfdx auto-generates, containing information about all configured aliases. Used for username autocompletion.
-* `sfdx_executable`: Name of the sfdx executable. Useful if you've aliased the executable to something else, or to specify the full path if it's not in the $PATH.
+* `sfdx_executable`: Name of the sf-cli executable. Useful if you've aliased the executable to something else, or to specify the full path if it's not in the $PATH.
 
 ## Usage
 

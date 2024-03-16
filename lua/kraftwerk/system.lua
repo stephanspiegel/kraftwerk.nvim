@@ -3,18 +3,18 @@ local health = vim.health
 local config = require("kraftwerk.config")
 local functor = require("kraftwerk.util.functor")
 
-local oldest_supported_version = "7.190.2"
+local oldest_supported_version = "2.30.8"
 
 local function get_sfdx_executable()
-    local sfdx_executable = 'sfdx'
+    local sfdx_executable = 'sf'
     local executable = config.get('sfdx_executable')
-    if  executable ~= nil then
+    if executable ~= nil then
         sfdx_executable = executable
     end
     return sfdx_executable
 end
 
-local function sfdx_is_installed()
+local function sf_is_installed()
     local is_installed = vim.fn.executable(get_sfdx_executable())
     return (is_installed == 1)
 end
@@ -39,15 +39,15 @@ local function version_is_supported(version_number)
 end
 
 local function check_health()
-    health.report_start("Check sfdx-cli")
-    if sfdx_is_installed() then
-        health.report_ok("Found sfdx executable")
+    health.report_start("Check sf-cli")
+    if sf_is_installed() then
+        health.report_ok("Found sf executable")
     else
-        health.report_error("Couldn't find sfdx", {
-                "run in shell: npm install sfdx-cli --global",
-                "see install instructions: https://developer.salesforce.com/tools/sfdxcli",
-                "make sure sfdx is in your path environment variable",
-                "(optional): specify sfdx-cli executable along with full path in g:kraftwerk_sfdx_executable"
+        health.report_error("Couldn't find sf", {
+                "run in shell: npm install @salesforce/cli --global",
+                "see install instructions: https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_install_cli.htm",
+                "make sure sf is in your path environment variable",
+                "(optional): specify sf-cli executable along with full path in g:kraftwerk_sfdx_executable"
             })
         return
     end
@@ -55,7 +55,7 @@ local function check_health()
     if not functor.has_key(version_result, 'cliVersion') then
         local advice = {}
         local sfdx_executable = get_sfdx_executable()
-        if sfdx_executable ~= 'sfdx' then
+        if sfdx_executable ~= 'sf' then
             table.insert(advice, 'The sfdx_executable is configured to be `'..sfdx_executable..'`. Is this correct?')
             table.insert(advice, 'Make sure that `'..sfdx_executable..'` resolves to the sfdx-cli executable file')
         end
@@ -77,7 +77,7 @@ local function check_health()
                         "found. Must have at least",
                         oldest_supported_version
                 ), {
-                    "run in shell: sfdx update"
+                    "run in shell: sf update"
         })
         return
     end

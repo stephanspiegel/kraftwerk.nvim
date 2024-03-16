@@ -83,7 +83,7 @@ end
 --[[--
 Build an error item from a "force:source:push" error.
 Pure function
-@tparam result table  The "result" field in the response returned by sfdx
+@tparam result table  The "result" field in the response returned by sf
 @tresult table A list of error items ready to pass to quickfix
 ]]
 local function build_push_error_item(result)
@@ -247,7 +247,7 @@ end
 --[[--
 Build a list of error items from a failure result (non-compile issue) of "force:apex:execute".
 Pure function
-@tparam result table  The "result" field in the response returned by sfdx
+@tparam result table  The "result" field in the response returned by sf
 @treturn table A list of error items ready to pass to quickfix
 ]]
 local function build_execute_anonymous_error_items(result)
@@ -258,7 +258,7 @@ end
 --[[--
 Build a list of error items from a "force:source:push" failure.
 Pure function
-@tparam results table  The "result" field in the response returned by sfdx
+@tparam results table  The "result" field in the response returned by sf
 @treturn table A list of error items ready to pass to quickfix
 ]]
 local function build_push_error_items(results)
@@ -268,7 +268,7 @@ end
 --[[--
 Build a list of error items from a unit test failure returned by "force:apex:test:run".
 Pure function
-@tparam result table  The "result" field in the response returned by sfdx
+@tparam result table  The "result" field in the response returned by sf
 @treturn table A list of error items ready to pass to quickfix
 ]]
 local function build_test_error_items(result)
