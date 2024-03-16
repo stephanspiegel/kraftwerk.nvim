@@ -18,16 +18,16 @@ local function push_callback(result)
             io_data.quickfix = quickfix.build_push_error_items(result.result)
         end
     else
-        local pushedSource = result.result.pushedSource
-        if next(pushedSource) == nil then
-            io_data.messages.warn = { 'Nothing to push.' }
+        local status = result.result.status
+        if status == 'Nothing to deploy' then
+            io_data.messages.warn = { status }
         else
             local info_messages = {}
-            for _, source_item in ipairs(result.result.pushedSource) do
-                local report_line = source_item.state .. " " .. source_item.filePath
+            table.insert(info_messages, 'Deploy succeeded')
+            for _, source_item in ipairs(result.result.files) do
+                local report_line = source_item.state .. " " .. source_item.fullName
                 table.insert(info_messages, report_line)
             end
-            table.insert(info_messages, 'Push succeeded')
             io_data.messages.info = info_messages
         end
     end
@@ -38,7 +38,7 @@ end
 Call sf project deploy start.
 --]]
 local function build_push_command(input)
-    local sfdx_command = { 'project:deploy:start' }
+    local sfdx_command = { 'project', 'deploy', 'start' }
     if functor.has_key(input, 'user') then
         table.insert(sfdx_command, '--target-org=' .. input.user)
     end
@@ -66,7 +66,7 @@ end
 Call sfdx project retrieve start.
 --]]
 local function build_pull_command()
-    return { 'project:retrieve:start' }, pull_callback
+    return { 'project', 'retrieve', 'start' }, pull_callback
 end
 
 local pull_command = {

@@ -35,7 +35,7 @@ local function handle_failure(result)
 end
 
 local function build_testrun_command(input)
-    local sfdx_command = { 'apex run test' }
+    local sfdx_command = { 'apex', 'run', 'test' }
     local test_article = vim.fn.expand('%:t:r:') -- default: current file
     if functor.has_key(input, 'file_or_method') and not text.is_blank(input.file_or_method) then
         test_article = input.file_or_method
@@ -124,7 +124,7 @@ local function execute_callback(result)
 end
 
 local function build_execute_command(input)
-    local sfdx_command_parts = { 'apex run' }
+    local sfdx_command_parts = { 'apex', 'run' }
     sfdx_command_parts = functor.append(sfdx_command_parts, '--file='..input.temp_file_path)
     if functor.has_key(input, 'user') then
         sfdx_command_parts = functor.append(sfdx_command_parts, ' --target-org=' .. input.user)

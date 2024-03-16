@@ -16,7 +16,7 @@ local result_configs = {
 local function build_query_command(input)
     local query_string = input.content
     local format = input.format
-    local sfdx_command = {'data query'}
+    local sfdx_command = {'data', 'query'}
     table.insert(sfdx_command, '--query=' .. query_string)
     local result_config = result_configs[format]
     local result_format = format

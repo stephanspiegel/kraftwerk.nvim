@@ -10,7 +10,7 @@ describe("source", function()
             it("should build the command correctly", function()
                 local input = {}
                 local sfdx_command, _ = source.push.build_command(input)
-                assert.are_equal('force:source:push', sfdx_command)
+                assert.are.same({'project', 'deploy', 'start'}, sfdx_command)
             end)
 
         end)
@@ -23,12 +23,12 @@ describe("source", function()
                 local result = {
                     status = 0,
                     result = {
-                        pushedSource = {}
+                        status = 'Nothing to deploy'
                     }
                 }
                 local expected = {
                     messages = {
-                        warn = { 'Nothing to push.' },
+                        warn = { 'Nothing to deploy' },
                     }
                 }
                 assert.same(expected, callback(result))
@@ -114,29 +114,70 @@ describe("source", function()
 {
   "status": 0,
   "result": {
-    "pushedSource": [
-      {
-        "state": "Changed",
-        "fullName": "GameEngine",
-        "type": "ApexClass",
-        "filePath": "force-app/main/default/classes/GameEngine.cls"
+    "checkOnly": false,
+    "completedDate": "2024-03-16T13:03:25.000Z",
+    "createdBy": "0057e00000WjbUN",
+    "createdByName": "User User",
+    "createdDate": "2024-03-16T13:03:23.000Z",
+    "details": {
+      "componentSuccesses": [
+        {
+          "changed": true,
+          "componentType": "ApexClass",
+          "created": false,
+          "createdDate": "2024-03-16T13:03:24.000Z",
+          "deleted": false,
+          "fileName": "classes/AlmanacResolver.cls",
+          "fullName": "AlmanacResolver",
+          "id": "01p7e00000LDE1ZAAX",
+          "success": true
+        }
+      ],
+      "runTestResult": {
+        "numFailures": 0,
+        "numTestsRun": 0,
+        "totalTime": 0,
+        "codeCoverage": [],
+        "codeCoverageWarnings": [],
+        "failures": [],
+        "flowCoverage": [],
+        "flowCoverageWarnings": [],
+        "successes": []
       },
+      "componentFailures": []
+    },
+    "done": true,
+    "id": "0Af7e00001lUlkKCAS",
+    "ignoreWarnings": false,
+    "lastModifiedDate": "2024-03-16T13:03:25.000Z",
+    "numberComponentErrors": 0,
+    "numberComponentsDeployed": 1,
+    "numberComponentsTotal": 1,
+    "numberTestErrors": 0,
+    "numberTestsCompleted": 0,
+    "numberTestsTotal": 0,
+    "rollbackOnError": true,
+    "runTestsEnabled": false,
+    "startDate": "2024-03-16T13:03:24.000Z",
+    "status": "Succeeded",
+    "success": true,
+    "files": [
       {
+        "fullName": "AlmanacResolver",
+        "type": "ApexClass",
         "state": "Changed",
-        "fullName": "Entity__c.NPC",
-        "type": "RecordType",
-        "filePath": "force-app/main/default/objects/Entity__c/recordTypes/NPC.recordTyp e-meta.xml"
+        "filePath": "/home/stephan/Projects/salesforce/Apex_AdventOfCode2023/force-app/main/default/classes/AlmanacResolver.cls"
       }
     ]
-  }
+  },
+  "warnings": []
 }
                 ]]
                 local expected = {
                     messages = {
                         info = {
-                            'Changed force-app/main/default/classes/GameEngine.cls',
-                            'Changed force-app/main/default/objects/Entity__c/recordTypes/NPC.recordTyp e-meta.xml',
-                            'Push succeeded'
+                            'Deploy succeeded',
+                            'Changed AlmanacResolver'
                         }
                     }
                 }

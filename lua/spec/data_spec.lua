@@ -12,8 +12,14 @@ describe("data", function()
                     content = 'SELECT Id FROM User',
                     format = 'csv'
                 }
-                local expected = 'force:data:soql:query --query "SELECT Id FROM User"  --resultformat=csv'
-                assert.same(expected, build_command(input))
+                local expected =
+                {
+                    'data',
+                    'query',
+                    '--query=SELECT Id FROM User',
+                    '--result-format=csv'
+                }
+                assert.are.same(expected, build_command(input))
             end)
         end)
 
