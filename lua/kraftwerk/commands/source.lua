@@ -13,9 +13,12 @@ Callback for the force:push command
 local function push_callback(result)
     local io_data = { messages = {} }
     if result.status ~= 0 then
-        io_data.messages.err = { result.commandName .. ": " .. result.message }
+        io_data.messages.err = { result.result.status }
         if functor.has_key(result, 'result') then
-            io_data.quickfix = quickfix.build_push_error_items(result.result)
+            local error_results = functor.filter(function(result_item)
+                return result_item.state == 'Failed'
+            end, result.result.files)
+            io_data.quickfix = quickfix.build_push_error_items(error_results)
         end
     else
         local status = result.result.status
@@ -24,8 +27,12 @@ local function push_callback(result)
         else
             local info_messages = {}
             table.insert(info_messages, 'Deploy succeeded')
+            local unique_lines = {} -- using this as a "pseudo set" because *.cls and *.cls-meta.xml changes show up as duplicates otherwise
             for _, source_item in ipairs(result.result.files) do
-                local report_line = source_item.state .. " " .. source_item.fullName
+                local report_line = source_item.state .. ": " .. source_item.fullName
+                unique_lines[report_line] = true
+            end
+            for report_line in pairs(unique_lines) do
                 table.insert(info_messages, report_line)
             end
             io_data.messages.info = info_messages

@@ -81,7 +81,7 @@ local function build_compile_error_items(sfdx_result)
 end
 
 --[[--
-Build an error item from a "force:source:push" error.
+Build an error item from a "project deploy start" error.
 Pure function
 @tparam result table  The "result" field in the response returned by sf
 @tresult table A list of error items ready to pass to quickfix
