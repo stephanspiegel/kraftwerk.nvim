@@ -2,6 +2,7 @@ local completion = require('kraftwerk.util.completion')
 local text = require('kraftwerk.util.text')
 local functor = require('kraftwerk.util.functor')
 local quickfix = require('kraftwerk.util.quickfix')
+local english = require('kraftwerk.util.english')
 
 local function complete_test_file_or_method(arg_lead, cmd_line, cursor_pos)
     if vim.fn.executable('rg') then
@@ -30,7 +31,7 @@ local expected_testrun_input = {
 
 local function handle_failure(result)
     local io_data = { messages = {} }
-    io_data.messages.err = { result.commandName .. ": " .. result.message }
+    io_data.messages.err = { result.message }
     return io_data
 end
 
@@ -45,20 +46,28 @@ local function build_testrun_command(input)
     if functor.has_key(input, 'user') then
         table.insert(sfdx_command, '--target-org=' .. input.user)
     end
-    table.insert(sfdx_command, '--synchronous')
+    table.insert(sfdx_command, '--wait=30')
     local function testrun_callback(sfdx_result)
         local result = sfdx_result.result
         if not functor.has_key(result, 'summary') then
-            return handle_failure(result)
+            return handle_failure(sfdx_result)
         else
             local io_data = { messages = {} }
             local summary = result.summary
-            io_data.messages.info = { 'Ran ' ..summary.testsRan .. ' test(s) in ' .. summary.testTotalTime .. '.'}
+            local test_run_message = english.pluralize('Ran {!number} {!noun} in ' .. summary.testTotalTime,
+                summary.testsRan, 'test')
             if summary.outcome == 'Failed' then
-                io_data.messages.err = { summary.failing .. ' test(s) failed' }
+                test_run_message = test_run_message .. english.pluralize(' -- {!number} {!noun} failed',
+                    summary.failing, 'test')
+                io_data.messages.err = test_run_message
                 io_data.quickfix = quickfix.build_test_error_items(result)
             else
-                table.insert(io_data.messages.info, 'All tests passed')
+                if (summary.testsRan == 1) then
+                    test_run_message = test_run_message .. ' -- it passed!'
+                else
+                    test_run_message = test_run_message .. ' -- they all passed!'
+                end
+                io_data.messages.info = { test_run_message }
             end
             return io_data
         end
