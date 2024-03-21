@@ -136,7 +136,7 @@ local function build_execute_command(input)
     local sfdx_command_parts = { 'apex', 'run' }
     sfdx_command_parts = functor.append(sfdx_command_parts, '--file='..input.temp_file_path)
     if functor.has_key(input, 'user') then
-        sfdx_command_parts = functor.append(sfdx_command_parts, ' --target-org=' .. input.user)
+        sfdx_command_parts = functor.append(sfdx_command_parts, '--target-org=' .. input.user)
     end
     return sfdx_command_parts, execute_callback
 end
