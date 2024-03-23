@@ -4,6 +4,8 @@ local echo = require('kraftwerk.util.echo')
 local window_handler = require('kraftwerk.util.window_handler')
 local text = require('kraftwerk.util.text')
 
+local current_buffer;
+
 local function message_handler(message_data)
     echo.multiline(message_data)
 end
@@ -26,7 +28,7 @@ local interpolators = {
     ['selection_start_line_plus:%s*(%d+)'] = offset_line_number_from_selection,
     ['selection_start_col_plus:%s*(%d+)'] = offset_column_number_from_selection,
     ['file_path_to:%s*(.*)'] = find_file,
-    current_buffer_number = function() return vim.fn.bufnr('%') end,
+    current_buffer_number = function() return current_buffer end,
 }
 
 local function interpolate(source_value)
@@ -92,6 +94,7 @@ local handlers = {
 }
 
 local function output(output_data)
+    current_buffer = vim.fn.bufnr('%')
     for key, value in pairs(output_data) do
         if not functor.has_key(handlers, key) then
             echo.err('io_handler received unknown key: '..key)
