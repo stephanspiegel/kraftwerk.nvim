@@ -105,12 +105,7 @@ local function execute_callback(result)
     local io_data = {
         messages = {}
     }
-    local run_result
-    if functor.has_key(result, 'result') then
-        run_result = result.result
-    elseif functor.has_key(result, 'data') then
-        run_result = result.data
-    end
+    local run_result = functor.has_key(result, 'result') and result.result or result.data
     if run_result == nil then
         return handle_failure(result)
     end
@@ -122,21 +117,24 @@ local function execute_callback(result)
             content = logs,
             file_type = 'apexlog'
         }
-    elseif not functor.has_key(run_result, 'compiled') then
+        return io_data
+    end
+    if not functor.has_key(run_result, 'compiled') then
         return handle_failure(result)
-    elseif run_result.compiled then
-        io_data.quickfix = quickfix.build_execute_anonymous_error_items(run_result)
-        local logs = text.split(run_result.logs, '\n')
-        io_data.result_buffer = {
-            title = '__Apex_Result__',
-            content = logs,
-            file_type = 'apexlog'
-        }
-        io_data.messages.err = {'Error executing anonymous code'}
-    elseif not run_result.compiled then
+    end
+    if not run_result.compiled then
         io_data.quickfix = quickfix.build_compile_error_items(run_result)
         io_data.messages.err = {'Error compiling anonymous code'}
+        return io_data
     end
+    io_data.quickfix = quickfix.build_execute_anonymous_error_items(run_result)
+    local logs = text.split(run_result.logs, '\n')
+    io_data.result_buffer = {
+        title = '__Apex_Result__',
+        content = logs,
+        file_type = 'apexlog'
+    }
+    io_data.messages.err = {'Error executing anonymous code'}
     return io_data
 end
 
