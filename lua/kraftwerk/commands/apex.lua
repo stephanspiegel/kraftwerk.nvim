@@ -6,7 +6,7 @@ local english = require('kraftwerk.util.english')
 
 local function complete_test_file_or_method(arg_lead, cmd_line, cursor_pos)
     if vim.fn.executable('rg') then
-        local test_file_paths = vim.fn.system('rg "@isTest" --files-with-matches')
+        local test_file_paths = vim.fn.system('rg "@isTest" -i --files-with-matches')
         local test_file_names = functor.map(function(test_file_path)
             return vim.fn.fnamemodify(test_file_path, ':t:r')
         end, text.split(test_file_paths, '\n'))
