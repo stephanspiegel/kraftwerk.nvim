@@ -35,7 +35,7 @@ local function build_query_command(input)
         table.insert(sfdx_command, user_clause)
     end
     if input.bang then
-        local tooling_api_clause = ' --use-tooling-api'
+        local tooling_api_clause = '--use-tooling-api'
         table.insert(sfdx_command, tooling_api_clause)
     end
     -- sfdx_command = sfdx_command .. result_format_clause .. user_clause .. tooling_api_clause
