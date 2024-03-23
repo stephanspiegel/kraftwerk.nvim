@@ -139,7 +139,7 @@ local function write_temp_file_from(content)
     return temp_file_name
 end
 
-local function gather_content(expected_content, range)
+local function gather_content(expected_content, _)
     if not functor.has_key(expected_content, 'source') then
         echo.err('"source" is a required field when "content" is specified')
     end
