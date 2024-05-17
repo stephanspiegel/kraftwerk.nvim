@@ -1,11 +1,11 @@
 local ft_commands = -- { pattern, filteype }
-{ { "*/src/classes/*.cls", "apexcode" }
-, { "*/src/triggers/*.trigger", "apexcode" }
-, { "*/force-app/**/classes/*.cls", "apexcode" }
-, { "*/force-app/**/triggers/*.trigger", "apexcode" }
-, { "*.apex", "apexcode" }
+{ { "*/src/classes/*.cls", "apex" }
+, { "*/src/triggers/*.trigger", "ape" }
+, { "*/force-app/**/classes/*.cls", "apex" }
+, { "*/force-app/**/triggers/*.trigger", "apex" }
+, { "*.apex", "apex" }
 , { "*.soql", "soql" }
-, { "*.apexcode", "apexcode" }
+, { "*.apexcode", "apex" }
 }
 
 vim.api.nvim_command("augroup apex")
